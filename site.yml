@@ -1,0 +1,7 @@
+---
+- name: Base configuration for all nodes
+  hosts: all
+  become: true
+  roles:
+    - bootstrap
+    - ssh

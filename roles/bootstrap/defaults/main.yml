@@ -1,0 +1,13 @@
+---
+bootstrap_timezone: Europe/Paris
+bootstrap_packages:
+  - ca-certificates
+  - curl
+  - git
+  - gnupg
+  - htop
+  - jq
+  - tmux
+  - unattended-upgrades
+  - unzip
+  - vim

@@ -1,0 +1,4 @@
+---
+exclude_paths:
+  - .venv_ansible/
+  - group_vars/all/vault.yml

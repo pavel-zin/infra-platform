@@ -1,0 +1,4 @@
+# group_vars/all/vars.yml
+---
+domain: pavel-zin.com
+bootstrap_timezone: Europe/Paris

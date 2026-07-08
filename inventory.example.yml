@@ -1,0 +1,10 @@
+all:
+  vars:
+    ansible_user: ubuntu
+  children:
+    edge:
+      hosts:
+        edge1: { ansible_host: EDGE_IP_OR_DNS }
+    core:
+      hosts:
+        core1: { ansible_host: CORE_IP_OR_DNS }
