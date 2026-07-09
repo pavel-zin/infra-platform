@@ -36,3 +36,18 @@
     owner: root
     group: root
     mode: "0644"
+
+- name: Disable rpcbind
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - rpcbind.socket
+    - rpcbind.service
+
+- name: Purge ufw (nftables role owns the host firewall)
+  ansible.builtin.apt:
+    name: ufw
+    state: absent
+    purge: true

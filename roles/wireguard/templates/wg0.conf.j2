@@ -1,0 +1,11 @@
+# Managed by Ansible
+[Interface]
+Address = {{ wg_address }}
+ListenPort = 51820
+PrivateKey = {{ wg_private_key }}
+
+[Peer]
+PublicKey = {{ wg_peer_public_key }}
+Endpoint = {{ wg_peer_endpoint }}:51820
+AllowedIPs = {{ wg_peer_allowed_ips }}
+PersistentKeepalive = 25

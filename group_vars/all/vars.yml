@@ -1,4 +1,5 @@
-# group_vars/all/vars.yml
 ---
 domain: pavel-zin.com
 bootstrap_timezone: Europe/Paris
+wg_public_key_edge: "LNAjp4qWXpc24mR7/WSy6EcX8Q1bOzWpcU507UEuP1I="
+wg_public_key_core: "qH444Bo1EBBtEtTOxqwWxA8Y8GfFwHbF5o3Y1sR7YXU="

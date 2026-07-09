@@ -1,0 +1,8 @@
+---
+private_net_mac: "02:00:17:0d:6b:81"
+private_net_ip: 10.99.0.10
+wg_address: 10.66.0.1/24
+wg_private_key: "{{ vault_wg_private_key_edge }}"
+wg_peer_public_key: "{{ wg_public_key_core }}"
+wg_peer_endpoint: 10.99.0.20
+wg_peer_allowed_ips: 10.66.0.2/32

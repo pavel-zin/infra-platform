@@ -3,11 +3,14 @@ bootstrap_timezone: Europe/Paris
 bootstrap_packages:
   - ca-certificates
   - curl
+  - dnsutils
   - git
   - gnupg
   - htop
+  - iputils-ping
   - jq
   - tmux
+  - traceroute
   - unattended-upgrades
   - unzip
   - vim

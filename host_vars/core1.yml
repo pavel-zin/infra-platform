@@ -1,0 +1,9 @@
+# host_vars/core.yml
+---
+private_net_mac: "02:00:17:11:e8:72"
+private_net_ip: 10.99.0.20
+wg_address: 10.66.0.2/24
+wg_private_key: "{{ vault_wg_private_key_core }}"
+wg_peer_public_key: "{{ wg_public_key_edge }}"
+wg_peer_endpoint: 10.99.0.10
+wg_peer_allowed_ips: 10.66.0.1/32
