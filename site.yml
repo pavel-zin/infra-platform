@@ -1,5 +1,5 @@
 ---
-- name: Base configuration for all nodes
+- name: Base configuration
   hosts: all
   become: true
   roles:
@@ -7,3 +7,10 @@
     - ssh
     - private_net
     - wireguard
+
+- name: Host firewall
+  hosts: core,edge
+  become: true
+  serial: 1
+  roles:
+    - nftables

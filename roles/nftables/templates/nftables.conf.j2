@@ -1,0 +1,39 @@
+# Managed by Ansible
+#!/usr/sbin/nft -f
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        iifname "lo" accept
+        ct state established,related accept
+        ct state invalid drop
+
+        ip protocol icmp accept
+        ip6 nexthdr icmpv6 accept
+
+        # SSH
+        tcp dport 22 accept
+
+        # WireGuard only on the private underlay
+        iifname "private0" udp dport 51820 accept
+
+        # Trust tunnel traffic
+        iifname "wg0" accept
+{% if 'edge' in group_names %}
+
+        # Public web (edge only)
+        tcp dport { 80, 443 } accept
+{% endif %}
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+    }
+}
+

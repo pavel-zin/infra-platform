@@ -1,0 +1,54 @@
+---
+- name: Purge iptables-persistent (Oracle image leftover)
+  ansible.builtin.apt:
+    name:
+      - iptables-persistent
+      - netfilter-persistent
+    state: absent
+    purge: true
+
+- name: Remove Oracle iptables rules
+  ansible.builtin.file:
+    path: /etc/iptables
+    state: absent
+
+- name: Install nftables
+  ansible.builtin.apt:
+    name: nftables
+    state: present
+
+- name: Clear any previous rollback timer
+  ansible.builtin.systemd:
+    name: nft-rollback.timer
+    state: stopped
+  failed_when: false
+
+- name: Prepare firewall rollback in 3 min
+  ansible.builtin.command: >
+    systemd-run --on-active=3min --unit=nft-rollback
+    /usr/sbin/nft flush ruleset
+  changed_when: true
+
+- name: Deploy nftables ruleset
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0640"
+    validate: /usr/sbin/nft -c -f %s
+  notify: Reload nftables
+
+- name: Apply firewall
+  ansible.builtin.meta: flush_handlers
+
+- name: Force a fresh SSH connection
+  ansible.builtin.meta: reset_connection
+
+- name: Verify that host is reachable
+  ansible.builtin.wait_for_connection:
+    timeout: 60
+
+- name: Disable rollback
+  ansible.builtin.command: systemctl stop nft-rollback.timer  # noqa: command-instead-of-module
+  changed_when: true
