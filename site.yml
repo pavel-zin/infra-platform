@@ -14,3 +14,9 @@
   serial: 1
   roles:
     - nftables
+
+- name: Container runtime
+  hosts: all
+  become: true
+  roles:
+    - docker
