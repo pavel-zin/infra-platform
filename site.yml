@@ -20,3 +20,9 @@
   become: true
   roles:
     - docker
+
+- name: Database (core only)
+  hosts: core
+  become: true
+  roles:
+    - mariadb

@@ -37,6 +37,9 @@ table inet filter {
         # Container egress
         iifname "docker0" accept
         iifname "br-*" accept
+
+        # Tunnel traffic forwarded into containers (published on wg0 addresses)
+        iifname "wg0" accept
     }
 
     chain output {

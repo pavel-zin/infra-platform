@@ -1,0 +1,25 @@
+---
+- name: Create data and stack directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - /opt/mariadb/data
+    - /opt/stacks/mariadb
+
+- name: Deploy compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: /opt/stacks/mariadb/compose.yml
+    owner: root
+    group: root
+    mode: "0600"
+  diff: false
+
+- name: Start MariaDB stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/stacks/mariadb
+    state: present

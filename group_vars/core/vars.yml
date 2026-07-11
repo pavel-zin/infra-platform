@@ -1,0 +1,4 @@
+---
+mariadb_root_password: "{{ vault_mariadb_root_password }}"
+mariadb_wp_password: "{{ vault_mariadb_wp_password }}"
+mariadb_bind_ip: 10.66.0.2

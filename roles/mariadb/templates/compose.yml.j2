@@ -1,0 +1,20 @@
+# Managed by Ansible
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: "{{ mariadb_root_password }}"
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: "{{ mariadb_wp_password }}"
+    ports:
+      - "{{ mariadb_bind_ip }}:3306:3306"
+    volumes:
+      - /opt/mariadb/data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

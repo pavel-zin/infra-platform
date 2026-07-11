@@ -52,6 +52,26 @@
     mode: "0644"
   notify: Restart docker
 
+- name: Create Docker systemd drop-in directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure Docker starts after WireGuard
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/docker.service.d/after-wireguard.conf
+    content: |
+      [Unit]
+      After=wg-quick@wg0.service
+      Wants=wg-quick@wg0.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart docker
+
 - name: Enable and start Docker
   ansible.builtin.systemd:
     name: docker
