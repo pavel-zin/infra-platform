@@ -34,3 +34,28 @@
   community.docker.docker_compose_v2:
     project_src: /opt/stacks/web
     state: present
+
+- name: Deploy certbot renewal service unit
+  ansible.builtin.template:
+    src: certbot-renew.service.j2
+    dest: /etc/systemd/system/certbot-renew.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart certbot renewal timer
+
+- name: Deploy certbot renewal timer unit
+  ansible.builtin.template:
+    src: certbot-renew.timer.j2
+    dest: /etc/systemd/system/certbot-renew.timer
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart certbot renewal timer
+
+- name: Enable certbot renewal timer
+  ansible.builtin.systemd:
+    name: certbot-renew.timer
+    enabled: true
+    state: started
+    daemon_reload: true

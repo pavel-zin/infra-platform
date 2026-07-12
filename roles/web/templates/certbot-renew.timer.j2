@@ -1,0 +1,11 @@
+# Managed by Ansible
+[Unit]
+Description=Certbot renewal timer (twice daily)
+
+[Timer]
+OnCalendar=*-*-* 04,16:20:00
+RandomizedDelaySec=3600
+Persistent=true
+
+[Install]
+WantedBy=timers.target
