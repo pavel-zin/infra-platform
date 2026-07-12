@@ -40,6 +40,11 @@ table inet filter {
 
         # Tunnel traffic forwarded into containers (published on wg0 addresses)
         iifname "wg0" accept
+{% if 'edge' in group_names %}
+        # Public web: DNAT'd into the nginx container, so packets traverse
+        # FORWARD (not INPUT); dport is preserved through DNAT
+        tcp dport { 80, 443 } accept
+{% endif %}
     }
 
     chain output {
