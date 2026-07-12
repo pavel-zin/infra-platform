@@ -5,7 +5,6 @@
   roles:
     - bootstrap
     - ssh
-    - private_net
     - wireguard
 
 - name: Host firewall
@@ -26,3 +25,9 @@
   become: true
   roles:
     - mariadb
+
+- name: Web
+  hosts: edge
+  become: true
+  roles:
+    - web

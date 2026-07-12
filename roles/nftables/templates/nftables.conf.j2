@@ -16,14 +16,14 @@ table inet filter {
         # SSH
         tcp dport 22 accept
 
-        # WireGuard only on the private underlay
-        iifname "private0" udp dport 51820 accept
+        # WireGuard from VCN
+        ip saddr 10.0.0.0/24 udp dport 51820 accept
 
         # Trust tunnel traffic
         iifname "wg0" accept
 {% if 'edge' in group_names %}
 
-        # Public web (edge only)
+        # Public web — host-level (fallback/standalone tools)
         tcp dport { 80, 443 } accept
 {% endif %}
     }
