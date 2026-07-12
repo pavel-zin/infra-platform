@@ -1,0 +1,21 @@
+# Managed by Ansible
+services:
+  nginx:
+    image: nginx:1.27
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    volumes:
+      - /opt/web/nginx/conf.d:/etc/nginx/conf.d:ro
+      - /opt/web/site:/usr/share/nginx/html:ro
+      - /opt/web/certbot/www:/var/www/certbot:ro
+      - /opt/web/certbot/conf:/etc/letsencrypt:ro
+
+  certbot:
+    image: certbot/certbot
+    profiles: ["tools"]
+    volumes:
+      - /opt/web/certbot/www:/var/www/certbot
+      - /opt/web/certbot/conf:/etc/letsencrypt

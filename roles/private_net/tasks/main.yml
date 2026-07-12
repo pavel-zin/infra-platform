@@ -1,9 +1,0 @@
----
-- name: Deploy netplan config for private interface
-  ansible.builtin.template:
-    src: 60-private.yaml.j2
-    dest: /etc/netplan/60-private.yaml
-    owner: root
-    group: root
-    mode: "0600"
-  notify: Apply netplan

@@ -1,0 +1,34 @@
+# Managed by Ansible
+server {
+    listen 80;
+    server_name {{ domain }} www.{{ domain }};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+{% if tls_enabled %}
+    location / {
+        return 301 https://{{ domain }}$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name {{ domain }} www.{{ domain }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+}
+{% else %}
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+}
+{% endif %}

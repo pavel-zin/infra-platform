@@ -1,0 +1,36 @@
+---
+- name: Create web directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - /opt/stacks/web
+    - /opt/web/nginx/conf.d
+    - /opt/web/site
+    - /opt/web/certbot/www
+    - /opt/web/certbot/conf
+
+- name: Deploy static site
+  ansible.builtin.copy:
+    src: index.html
+    dest: /opt/web/site/index.html
+    mode: "0644"
+
+- name: Deploy nginx vhost
+  ansible.builtin.template:
+    src: site.conf.j2
+    dest: /opt/web/nginx/conf.d/site.conf
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Deploy compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: /opt/stacks/web/compose.yml
+    mode: "0644"
+
+- name: Start web stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/stacks/web
+    state: present

@@ -1,0 +1,4 @@
+---
+- name: Reload nginx
+  ansible.builtin.command: docker exec nginx nginx -s reload  # noqa: command-instead-of-module
+  changed_when: true
