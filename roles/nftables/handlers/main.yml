@@ -3,10 +3,3 @@
   ansible.builtin.systemd:
     name: nftables
     state: restarted
-  notify: Restart docker if present
-
-- name: Restart docker if present
-  ansible.builtin.systemd:
-    name: docker
-    state: restarted
-  failed_when: false

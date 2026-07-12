@@ -17,6 +17,11 @@
     name: nftables
     state: present
 
+- name: Enable nftables at boot
+  ansible.builtin.systemd:
+    name: nftables
+    enabled: true
+
 - name: Clear any previous rollback timer
   ansible.builtin.systemd:
     name: nft-rollback.timer

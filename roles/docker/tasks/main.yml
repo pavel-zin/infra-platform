@@ -72,6 +72,18 @@
     mode: "0644"
   notify: Restart docker
 
+- name: Bind Docker to nftables
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/docker.service.d/bind-to-nftables.conf
+    content: |
+      [Unit]
+      PartOf=nftables.service
+      After=nftables.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart docker
+
 - name: Enable and start Docker
   ansible.builtin.systemd:
     name: docker
