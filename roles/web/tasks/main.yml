@@ -10,6 +10,8 @@
     - /opt/web/site
     - /opt/web/certbot/www
     - /opt/web/certbot/conf
+    - /opt/web/wordpress
+    - /opt/web/php
 
 - name: Deploy static site
   ansible.builtin.copy:
@@ -17,23 +19,110 @@
     dest: /opt/web/site/index.html
     mode: "0644"
 
-- name: Deploy nginx vhost
-  ansible.builtin.template:
-    src: site.conf.j2
-    dest: /opt/web/nginx/conf.d/site.conf
+- name: Deploy PHP upload limits
+  ansible.builtin.copy:
+    src: uploads.ini
+    dest: /opt/web/php/uploads.ini
     mode: "0644"
-  notify: Reload nginx
+
+- name: Read SANs of current certificate
+  ansible.builtin.command: >
+    openssl x509 -noout -ext subjectAltName
+    -in /opt/web/certbot/conf/live/{{ domain }}/fullchain.pem
+  register: web_cert_sans
+  changed_when: false
+  failed_when: false
+
+- name: Determine TLS state
+  ansible.builtin.set_fact:
+    web_tls_active: "{{ tls_enabled and web_cert_sans.rc == 0 }}"
+    web_cert_missing: "{{ web_cert_domains
+      | difference((web_cert_sans.stdout | default(''))
+      | regex_findall('DNS:([^,\\s]+)')) }}"
+
+- name: Render nginx vhosts
+  ansible.builtin.include_tasks: vhosts.yml
 
 - name: Deploy compose file
   ansible.builtin.template:
     src: compose.yml.j2
     dest: /opt/stacks/web/compose.yml
-    mode: "0644"
+    owner: root
+    group: root
+    mode: "0600"
+  diff: false
 
 - name: Start web stack
   community.docker.docker_compose_v2:
     project_src: /opt/stacks/web
     state: present
+
+- name: Issue or expand Let's Encrypt certificate
+  ansible.builtin.command: >-
+    docker compose -f /opt/stacks/web/compose.yml run --rm certbot certonly
+    --webroot -w /var/www/certbot
+    --cert-name {{ domain }}
+    {% for d in web_cert_domains %}-d {{ d }} {% endfor %}
+    --expand --non-interactive --agree-tos -m {{ certbot_email }}
+  when: tls_enabled and web_cert_missing | length > 0
+  register: web_cert_issued
+  changed_when: true
+  notify: Reload nginx
+
+- name: Activate TLS after first issuance
+  ansible.builtin.set_fact:
+    web_tls_active: true
+  when: web_cert_issued is changed  # noqa: no-handler — in-play bootstrap sequencing, must precede re-render
+
+- name: Re-render vhosts with TLS enabled
+  ansible.builtin.include_tasks: vhosts.yml
+  when: web_cert_issued is changed  # noqa: no-handler — same reason
+
+- name: Wait for WordPress core files (first-boot volume population)
+  ansible.builtin.wait_for:
+    path: /opt/web/wordpress/wp-settings.php
+    timeout: 120
+
+- name: Check WordPress install state
+  ansible.builtin.command: >-
+    docker compose -f /opt/stacks/web/compose.yml run --rm -T
+    wpcli wp core is-installed
+  register: web_wp_installed
+  changed_when: false
+  failed_when: web_wp_installed.rc not in [0, 1]
+
+- name: Install WordPress
+  ansible.builtin.command:
+    cmd: >-
+      docker compose -f /opt/stacks/web/compose.yml run --rm -T
+      wpcli wp core install
+      --url=https://blog.{{ domain }} --title=Blog
+      --admin_user={{ wordpress_admin_user }}
+      --admin_email={{ certbot_email }}
+      --prompt=admin_password --skip-email
+    stdin: "{{ wordpress_admin_password }}"
+  when: web_wp_installed.rc == 1
+  changed_when: true
+  no_log: true
+
+- name: Check Redis object-cache drop-in
+  ansible.builtin.stat:
+    path: /opt/web/wordpress/wp-content/object-cache.php
+  register: web_redis_dropin
+
+- name: Install and activate Redis object cache plugin
+  ansible.builtin.command: >-
+    docker compose -f /opt/stacks/web/compose.yml run --rm -T
+    wpcli wp plugin install redis-cache --activate
+  when: not web_redis_dropin.stat.exists
+  changed_when: true
+
+- name: Enable Redis object cache
+  ansible.builtin.command: >-
+    docker compose -f /opt/stacks/web/compose.yml run --rm -T
+    wpcli wp redis enable
+  when: not web_redis_dropin.stat.exists
+  changed_when: true
 
 - name: Deploy certbot renewal service unit
   ansible.builtin.template:

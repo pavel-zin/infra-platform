@@ -1,0 +1,14 @@
+---
+- name: Deploy nginx vhost
+  ansible.builtin.template:
+    src: site.conf.j2
+    dest: /opt/web/nginx/conf.d/site.conf
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Deploy blog vhost
+  ansible.builtin.template:
+    src: blog.conf.j2
+    dest: /opt/web/nginx/conf.d/blog.conf
+    mode: "0644"
+  notify: Reload nginx

@@ -1,9 +1,19 @@
 # Managed by Ansible
+x-wordpress-env: &wordpress_env
+  WORDPRESS_DB_HOST: 10.66.0.2:3306
+  WORDPRESS_DB_NAME: wordpress
+  WORDPRESS_DB_USER: wordpress
+  WORDPRESS_DB_PASSWORD: "{{ wordpress_db_password }}"
+  WORDPRESS_CONFIG_EXTRA: |
+    define('WP_REDIS_HOST', 'redis');
+
 services:
   nginx:
     image: nginx:1.27
     container_name: nginx
     restart: unless-stopped
+    depends_on:
+      - wordpress
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -12,6 +22,31 @@ services:
       - /opt/web/site:/usr/share/nginx/html:ro
       - /opt/web/certbot/www:/var/www/certbot:ro
       - /opt/web/certbot/conf:/etc/letsencrypt:ro
+      - /opt/web/wordpress:/var/www/html:ro
+
+  wordpress:
+    image: wordpress:6-fpm-alpine
+    container_name: wordpress
+    restart: unless-stopped
+    depends_on:
+      - redis
+    environment: *wordpress_env
+    volumes:
+      - /opt/web/wordpress:/var/www/html
+      - /opt/web/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+
+  wpcli:
+    image: wordpress:cli
+    profiles: ["tools"]
+    environment: *wordpress_env
+    volumes:
+      - /opt/web/wordpress:/var/www/html
 
   certbot:
     image: certbot/certbot

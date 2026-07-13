@@ -1,2 +1,10 @@
 ---
 tls_enabled: true
+certbot_email: admin@pavel-zin.com
+web_cert_domains:
+  - "{{ domain }}"
+  - "www.{{ domain }}"
+  - "blog.{{ domain }}"
+wordpress_db_password: "{{ vault_mariadb_wp_password }}"
+wordpress_admin_user: pzin
+wordpress_admin_password: "{{ vault_wordpress_admin_password }}"

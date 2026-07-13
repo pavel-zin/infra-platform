@@ -4,6 +4,7 @@ services:
     image: mariadb:11.4
     container_name: mariadb
     restart: unless-stopped
+    stop_grace_period: 1m
     environment:
       MARIADB_ROOT_PASSWORD: "{{ mariadb_root_password }}"
       MARIADB_DATABASE: wordpress

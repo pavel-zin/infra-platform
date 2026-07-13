@@ -1,0 +1,49 @@
+# Managed by Ansible
+server {
+    listen 80;
+    server_name blog.{{ domain }};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://blog.{{ domain }}$request_uri;
+    }
+}
+
+{% if web_tls_active %}
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name blog.{{ domain }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+
+    root /var/www/html;
+    index index.php;
+
+    client_max_body_size 64m;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location = /xmlrpc.php {
+        deny all;
+    }
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass wordpress:9000;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+    }
+}
+{% endif %}
