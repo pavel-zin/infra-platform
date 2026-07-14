@@ -1,0 +1,34 @@
+---
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ansible-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python toolchain
+        run: pip install -r requirements.txt
+
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install -r requirements.yml
+
+      - name: Satisfy ansible.cfg file references
+        run: |
+          cp inventory.example.yml inventory.yml
+          echo ci-placeholder > .ansible-vault-pass-infra
+
+      - name: Run ansible-lint
+        run: ansible-lint --strict

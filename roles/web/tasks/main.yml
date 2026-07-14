@@ -125,11 +125,18 @@
   when: not web_redis_dropin.stat.exists
   changed_when: true
 
+- name: Check for active plugins without auto-updates
+  ansible.builtin.command: >-
+    docker compose -f /opt/stacks/web/compose.yml run --rm -T
+    wpcli wp plugin list --field=name --auto_update=off --status=active
+  register: web_plugins_manual
+  changed_when: false
+
 - name: Enable plugin auto-updates
   ansible.builtin.command: >-
     docker compose -f /opt/stacks/web/compose.yml run --rm -T
     wpcli wp plugin auto-updates enable --all
-  when: not web_redis_dropin.stat.exists
+  when: web_plugins_manual.stdout_lines | length > 0
   changed_when: true
 
 - name: Deploy certbot renewal service unit
