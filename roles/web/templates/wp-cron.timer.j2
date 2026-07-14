@@ -1,0 +1,11 @@
+# Managed by Ansible
+[Unit]
+Description=WordPress cron timer
+
+[Timer]
+OnCalendar=*:0/15
+RandomizedDelaySec=120
+Persistent=true
+
+[Install]
+WantedBy=timers.target

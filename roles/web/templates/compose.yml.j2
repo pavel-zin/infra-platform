@@ -6,6 +6,8 @@ x-wordpress-env: &wordpress_env
   WORDPRESS_DB_PASSWORD: "{{ wordpress_db_password }}"
   WORDPRESS_CONFIG_EXTRA: |
     define('WP_REDIS_HOST', 'redis');
+    define('WP_AUTO_UPDATE_CORE', true);
+    define('DISABLE_WP_CRON', true);
 
 services:
   nginx:

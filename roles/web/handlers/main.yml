@@ -8,3 +8,9 @@
     name: certbot-renew.timer
     state: restarted
     daemon_reload: true
+
+- name: Restart wp-cron timer
+  ansible.builtin.systemd:
+    name: wp-cron.timer
+    state: restarted
+    daemon_reload: true

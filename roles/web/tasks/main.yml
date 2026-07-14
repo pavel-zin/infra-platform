@@ -56,6 +56,7 @@
   community.docker.docker_compose_v2:
     project_src: /opt/stacks/web
     state: present
+    pull: always
 
 - name: Issue or expand Let's Encrypt certificate
   ansible.builtin.command: >-
@@ -124,6 +125,13 @@
   when: not web_redis_dropin.stat.exists
   changed_when: true
 
+- name: Enable plugin auto-updates
+  ansible.builtin.command: >-
+    docker compose -f /opt/stacks/web/compose.yml run --rm -T
+    wpcli wp plugin auto-updates enable --all
+  when: not web_redis_dropin.stat.exists
+  changed_when: true
+
 - name: Deploy certbot renewal service unit
   ansible.builtin.template:
     src: certbot-renew.service.j2
@@ -145,6 +153,31 @@
 - name: Enable certbot renewal timer
   ansible.builtin.systemd:
     name: certbot-renew.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Deploy wp-cron service unit
+  ansible.builtin.template:
+    src: wp-cron.service.j2
+    dest: /etc/systemd/system/wp-cron.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart wp-cron timer
+
+- name: Deploy wp-cron timer unit
+  ansible.builtin.template:
+    src: wp-cron.timer.j2
+    dest: /etc/systemd/system/wp-cron.timer
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart wp-cron timer
+
+- name: Enable wp-cron timer
+  ansible.builtin.systemd:
+    name: wp-cron.timer
     enabled: true
     state: started
     daemon_reload: true
