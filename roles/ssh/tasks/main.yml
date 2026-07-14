@@ -8,3 +8,9 @@
     mode: "0600"
     validate: /usr/sbin/sshd -t -f %s
   notify: Restart ssh
+
+- name: Authorize CI deploy key
+  ansible.posix.authorized_key:
+    user: "{{ ansible_user }}"
+    key: "{{ deploy_ssh_public_key }}"
+    state: present

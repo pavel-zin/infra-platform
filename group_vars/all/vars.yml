@@ -3,3 +3,4 @@ domain: pavel-zin.com
 bootstrap_timezone: Europe/Paris
 wg_public_key_edge: "cG/7uDLGi9RA1aFlI4QjdWefxemIcE7+dXi1gdrmE2o="
 wg_public_key_core: "jtgIBIJdLuWyVBp2JB9FjDvOhUPl/Vj1W1fY6vECfG0="
+deploy_ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBKHgZu31DWjNAI6MLLU6qWn5g6S8GWfAW5tVBO9WAE6 gha-deploy"
