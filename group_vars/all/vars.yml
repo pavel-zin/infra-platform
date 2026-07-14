@@ -1,5 +1,5 @@
 ---
 domain: pavel-zin.com
 bootstrap_timezone: Europe/Paris
-wg_public_key_edge: "LNAjp4qWXpc24mR7/WSy6EcX8Q1bOzWpcU507UEuP1I="
-wg_public_key_core: "qH444Bo1EBBtEtTOxqwWxA8Y8GfFwHbF5o3Y1sR7YXU="
+wg_public_key_edge: "cG/7uDLGi9RA1aFlI4QjdWefxemIcE7+dXi1gdrmE2o="
+wg_public_key_core: "jtgIBIJdLuWyVBp2JB9FjDvOhUPl/Vj1W1fY6vECfG0="
