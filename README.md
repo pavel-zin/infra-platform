@@ -181,7 +181,3 @@ the public ports return without manual intervention:
 ```bash
 ssh edge1 'sudo systemctl restart nftables' && sleep 30 && curl -I https://<domain>
 ```
-
-## License
-
-MIT
