@@ -12,6 +12,7 @@
     - /opt/web/certbot/conf
     - /opt/web/wordpress
     - /opt/web/php
+    - /opt/web/uptime-kuma
 
 - name: Deploy static site
   ansible.builtin.copy:

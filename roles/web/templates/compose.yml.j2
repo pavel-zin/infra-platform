@@ -56,3 +56,12 @@ services:
     volumes:
       - /opt/web/certbot/www:/var/www/certbot
       - /opt/web/certbot/conf:/etc/letsencrypt
+  
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - /opt/web/uptime-kuma:/app/data
