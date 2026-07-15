@@ -1,5 +1,7 @@
 # infra-platform
 
+![Lint](https://github.com/pavel-zin/infra-platform/actions/workflows/lint.yml/badge.svg)
+
 Ansible-managed two-node infrastructure on Oracle Cloud (ARM64):
 a public **edge** node serving web workloads and an internal **core** node
 serving the database, connected by an encrypted WireGuard overlay. A bare
@@ -109,9 +111,16 @@ in the run recap.
 `0600` with `diff: false`. The real inventory (IPs, key paths) is gitignored;
 `inventory.example.yml` documents its shape.
 
+**The pipeline is the deployment path.** Every push and pull request runs
+`ansible-lint --strict`, and the full playbook deploys from a GitHub-hosted
+runner. The runner holds no standing state — a dedicated deploy SSH key,
+the vault password, and the real inventory are injected from repository
+secrets at runtime.
+
 ## Repository layout
 
 ```
+.github/workflows/       # CI: lint on push/PR · CD: deploy on dispatch
 site.yml                 # base → firewall (serial) → runtime → db (core) → web (edge)
 inventory.example.yml    # sanitized inventory shape; real inventory is gitignored
 requirements.yml         # Ansible collections
