@@ -15,9 +15,10 @@
 
 - name: Deploy static site
   ansible.builtin.copy:
-    src: index.html
-    dest: /opt/web/site/index.html
+    src: site/
+    dest: /opt/web/site/
     mode: "0644"
+    directory_mode: "0755"
 
 - name: Deploy PHP upload limits
   ansible.builtin.copy:
