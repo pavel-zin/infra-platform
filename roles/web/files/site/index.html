@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEMP</title>
+<meta name="description" content="Infrastructure / DevOps student at 42 Paris. Seeking a 4-6 month internship or an alternance.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='5' fill='%231a7f37'/></svg>">
+<style>
+  :root {
+    --ink: #16191d;
+    --muted: #57606a;
+    --line: #d8dee4;
+    --panel: #f6f8fa;
+    --green: #1a7f37;
+    --link: #0757ba;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #ffffff;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .page {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 3.5rem 1.25rem 2rem;
+  }
+
+  a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 2px; }
+
+  /* ---- header ---- */
+  .name {
+    margin: 0;
+    font-size: 2.1rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .role {
+    margin: 0.35rem 0 0;
+    font-size: 1.1rem;
+    color: var(--muted);
+  }
+  .contact {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.4rem;
+  }
+  .contact li { white-space: nowrap; }
+
+  /* ---- systemd hero ---- */
+  .unit-status {
+    margin: 2rem 0 0;
+    padding: 1rem 1.25rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  .unit-status pre { margin: 0; }
+  .dot { color: var(--green); }
+  .running { color: var(--green); font-weight: 600; }
+
+  /* ---- sections ---- */
+  section { margin-top: 2.6rem; }
+  h2 {
+    margin: 0 0 0.9rem;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+  }
+  h2::before { content: "["; }
+  h2::after  { content: "]"; }
+
+  p { margin: 0 0 0.8rem; }
+
+  .item { margin-bottom: 1.6rem; }
+  .item:last-child { margin-bottom: 0; }
+  .item-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+    margin-bottom: 0.3rem;
+  }
+  .item-title { font-weight: 600; }
+  .item-meta {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .item ul {
+    margin: 0.3rem 0 0;
+    padding-left: 1.15rem;
+  }
+  .item li { margin-bottom: 0.3rem; }
+
+  /* ---- screenshots ---- */
+  .shots {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin: 0.7rem 0 0;
+  }
+  .shots.single { grid-template-columns: 1fr; }
+  .shots img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .shot-placeholder {
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem;
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    background: var(--panel);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  /* ---- skills line ---- */
+  .skills-line {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.86rem;
+    line-height: 1.9;
+  }
+
+  /* ---- placeholders you must replace ---- */
+  .fill {
+    background: #fff3c2;
+    border-radius: 3px;
+    padding: 0 0.2em;
+  }
+
+  /* ---- footer ---- */
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 480px) {
+    .page { padding-top: 2.25rem; }
+    .name { font-size: 1.7rem; }
+    .unit-status { font-size: 0.72rem; padding: 0.8rem 0.9rem; }
+    .shots { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    .page { max-width: none; padding: 0; }
+    .unit-status { border-color: #bbb; }
+    a { color: var(--ink); text-decoration: none; }
+    footer { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1 class="name">[UNDER CONSTRUCTION]</h1>
+    <p class="role">Infrastructure / DevOps student at École 42</p>
+    <ul class="contact">
+      <li>Paris, Île-de-France</li>
+      <li><a href="mailto:pavel.zinurov.contacts@gmail.com">pavel.zinurov.contacts@gmail.com</a></li>
+      <li><a href="https://github.com/pavel-zin" rel="me">github.com/pavel-zin</a></li>
+    </ul>
+  </header>
+
+  <div class="unit-status" role="img" aria-label="Availability, styled as a systemd status block: active and seeking a 4 to 6 month internship or an alternance">
+<pre><span class="dot">●</span> pavel-zinurov.service
+     Loaded: loaded (Paris, Île-de-France; <b>enabled</b>)
+     Active: <span class="running">active (running)</span>
+       Docs: https://github.com/pavel-zin/infra-platform
+     Status: "Seeking an internship / work experience (4-6 months)
+              or an alternance"</pre>
+  </div>
+
+  <section>
+    <h2>profile</h2>
+    <p>Student at 42 Paris, systems and networks track. I'm interested in
+    designing, building and operating infrastructure like services, networking,
+    monitoring. I like privacy and free-software culture, and I run some humble
+    services that I use myself, along with a couple of other users. My dream is
+    to learn to operate such things at a bigger scale and in a specialized,
+    professional way.</p>
+    <p>Previously I studied mostly computer science and software development
+    tracks, but I switched toward infra as it seems to fit my interests
+    better.</p>
+  </section>
+
+  <section>
+    <h2>infrastructure</h2>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">infra-platform: two-node cloud platform, everything as code</span>
+        <span class="item-meta">2026 · Ansible / Oracle Cloud / ARM64</span>
+      </div>
+      <p>Two cloud servers managed entirely from a Git repository: one playbook
+      run turns a bare Ubuntu machine into a hardened node including firewalls,
+      an encrypted tunnel between the servers, automatic TLS, with a CI/CD
+      pipeline that lints and deploys every change.</p>
+      <p><a href="https://github.com/pavel-zin/infra-platform" rel="me">github.com/pavel-zin/infra-platform</a></p>
+      <div class="shots">
+        <div class="shot-placeholder">screenshot: public status page (Uptime Kuma) — replace with &lt;img src="img/status.png" alt="…"&gt;</div>
+        <div class="shot-placeholder">screenshot: public Grafana dashboard — img/grafana.png</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">Personal services platform</span>
+        <span class="item-meta"><span class="fill">⟨year⟩</span>–present · self-hosted</span>
+      </div>
+      <ul>
+        <li>Self-hosted service infrastructure in daily use: reverse proxy with
+            automatic TLS, file sync and sharing, password management,
+            monitoring dashboards.</li>
+      </ul>
+      <div class="shots single">
+        <div class="shot-placeholder">screenshot: dashboard / services overview — crop the URL bar (private domain, login-walled) — img/personal.png</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>projects</h2>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">cloud-1 — automated multi-server deployment</span>
+        <span class="item-meta"><span class="fill">⟨year⟩</span> · 42</span>
+      </div>
+      <p>Automated deployment of a containerized WordPress stack across
+      multiple cloud servers with Ansible.
+      <span class="fill">⟨adjust one-liner⟩</span>
+      — <a href="#"><span class="fill">⟨writeup link⟩</span></a></p>
+      <div class="shots single">
+        <div class="shot-placeholder">screenshot — img/cloud1.png</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">Inception-of-Things — K3s cluster provisioning</span>
+        <span class="item-meta"><span class="fill">⟨year⟩</span> · 42</span>
+      </div>
+      <p>Kubernetes (K3s/K3d) cluster provisioning with Vagrant and
+      GitOps-style application deployment.
+      <span class="fill">⟨adjust one-liner⟩</span>
+      — <a href="#"><span class="fill">⟨writeup link⟩</span></a></p>
+      <div class="shots single">
+        <div class="shot-placeholder">screenshot — img/iot.png</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title"><span class="fill">⟨project 3 title⟩</span></span>
+        <span class="item-meta"><span class="fill">⟨year⟩</span> · 42</span>
+      </div>
+      <p><span class="fill">⟨one-line description⟩</span>
+      — <a href="#"><span class="fill">⟨writeup link⟩</span></a></p>
+      <div class="shots single">
+        <div class="shot-placeholder">screenshot — img/project3.png</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title"><span class="fill">⟨project 4 title⟩</span></span>
+        <span class="item-meta"><span class="fill">⟨year⟩</span> · 42</span>
+      </div>
+      <p><span class="fill">⟨one-line description⟩</span>
+      — <a href="#"><span class="fill">⟨writeup link⟩</span></a></p>
+      <div class="shots single">
+        <div class="shot-placeholder">screenshot — img/project4.png</div>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title"><span class="fill">⟨project 5 title⟩</span></span>
+        <span class="item-meta"><span class="fill">⟨year⟩</span> · 42</span>
+      </div>
+      <p><span class="fill">⟨one-line description⟩</span>
+      — <a href="#"><span class="fill">⟨writeup link⟩</span></a></p>
+      <div class="shots single">
+        <div class="shot-placeholder">screenshot — img/project5.png</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>education</h2>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">42 Paris</span>
+        <span class="item-meta">2024-present</span>
+      </div>
+      <p>Program: RNCP 7 Expert en architecture informatique
+      (Système d'information et réseaux).</p>
+      <p>I started with the classical 42 experience in C/C++ and finished the
+      common core in 2025. Now I'm studying in the advanced part and
+      specializing.</p>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">Russian Technological University MIREA: College of Programming and Cybersecurity (Moscow)</span>
+        <span class="item-meta">2017-2021</span>
+      </div>
+      <p>Program: Programming in Computer Systems.</p>
+      <p>During my program at RTU I studied computer science, automata theory,
+      math and statistics, operating systems, C#/C++, and the web stack.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>skills</h2>
+    <p class="skills-line">Linux · Ansible (roles, Vault, lint) · Git · Docker ·
+    K3s · firewalls (nftables) · GitHub Actions · bash · C · C++ · Python</p>
+  </section>
+
+  <footer>
+    <p>This page is served by the infrastructure it describes: nginx on Oracle
+    Cloud, deployed by Ansible from a Git repository.<br>
+    No JavaScript, no cookies, no third-party requests.</p>
+  </footer>
+
+</div>
+</body>
+</html>
