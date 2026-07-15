@@ -16,6 +16,7 @@ services:
     restart: unless-stopped
     depends_on:
       - wordpress
+      - gatus
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
@@ -57,11 +58,12 @@ services:
       - /opt/web/certbot/www:/var/www/certbot
       - /opt/web/certbot/conf:/etc/letsencrypt
   
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
+  gatus:
+    image: twinproduction/gatus:v5
+    container_name: gatus
     restart: unless-stopped
-    ports:
-      - "3001:3001"
+    cap_add:
+      - NET_RAW
     volumes:
-      - /opt/web/uptime-kuma:/app/data
+      - /opt/web/gatus:/config:ro
+      - /opt/web/gatus-data:/data
