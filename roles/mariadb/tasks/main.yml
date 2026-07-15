@@ -24,3 +24,4 @@
     project_src: /opt/stacks/mariadb
     state: present
     pull: always
+    remove_orphans: true

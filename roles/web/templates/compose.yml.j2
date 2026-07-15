@@ -59,7 +59,7 @@ services:
       - /opt/web/certbot/conf:/etc/letsencrypt
   
   gatus:
-    image: twinproduction/gatus:v5
+    image: twinproduction/gatus:stable
     container_name: gatus
     restart: unless-stopped
     cap_add:
