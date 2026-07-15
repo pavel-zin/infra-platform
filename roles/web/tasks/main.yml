@@ -66,6 +66,7 @@
     project_src: /opt/stacks/web
     state: present
     pull: always
+    remove_orphans: true
 
 - name: Issue or expand Let's Encrypt certificate
   ansible.builtin.command: >-
