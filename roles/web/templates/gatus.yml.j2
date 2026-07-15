@@ -1,0 +1,37 @@
+# Managed by Ansible
+storage:
+  type: sqlite
+  path: /data/data.db
+
+ui:
+  title: "{{ domain }} — status"
+  header: "{{ domain }} — service status"
+
+endpoints:
+  - name: main
+    group: public
+    url: https://{{ domain }}
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: wp demo
+    group: public
+    url: https://blog.{{ domain }}
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: internal network (WireGuard)
+    group: internal
+    url: icmp://10.66.0.2
+    interval: 60s
+    conditions:
+      - "[CONNECTED] == true"
+
+  - name: database
+    group: internal
+    url: tcp://10.66.0.2:3306
+    interval: 60s
+    conditions:
+      - "[CONNECTED] == true"

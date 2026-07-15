@@ -1,14 +1,11 @@
 ---
-- name: Deploy nginx vhost
+- name: Deploy nginx vhosts
   ansible.builtin.template:
-    src: site.conf.j2
-    dest: /opt/web/nginx/conf.d/site.conf
+    src: "{{ item }}.j2"
+    dest: /opt/web/nginx/conf.d/{{ item }}
     mode: "0644"
-  notify: Reload nginx
-
-- name: Deploy blog vhost
-  ansible.builtin.template:
-    src: blog.conf.j2
-    dest: /opt/web/nginx/conf.d/blog.conf
-    mode: "0644"
+  loop:
+    - site.conf
+    - blog.conf
+    - status.conf
   notify: Reload nginx

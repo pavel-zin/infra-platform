@@ -12,7 +12,8 @@
     - /opt/web/certbot/conf
     - /opt/web/wordpress
     - /opt/web/php
-    - /opt/web/uptime-kuma
+    - /opt/web/gatus
+    - /opt/web/gatus-data
 
 - name: Deploy static site
   ansible.builtin.copy:
@@ -25,6 +26,12 @@
   ansible.builtin.copy:
     src: uploads.ini
     dest: /opt/web/php/uploads.ini
+    mode: "0644"
+
+- name: Deploy Gatus configuration
+  ansible.builtin.template:
+    src: gatus.yml.j2
+    dest: /opt/web/gatus/config.yaml
     mode: "0644"
 
 - name: Read SANs of current certificate
