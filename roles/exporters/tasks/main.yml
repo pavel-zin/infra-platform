@@ -1,0 +1,23 @@
+---
+- name: Create exporters stack directory
+  ansible.builtin.file:
+    path: /opt/stacks/exporters
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Deploy compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: /opt/stacks/exporters/compose.yml
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Start Exporters stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/stacks/exporters
+    state: present
+    pull: always
+    remove_orphans: true

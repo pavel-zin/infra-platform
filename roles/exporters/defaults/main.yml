@@ -1,0 +1,2 @@
+---
+exporters_wg_ip: "{{ wg_address.split('/')[0] }}"

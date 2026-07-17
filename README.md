@@ -52,9 +52,12 @@ internal is reachable from the public network.
 
 ## Design decisions
 
-**Published container ports default to loopback.** Docker's `daemon.json`
-sets `"ip": "127.0.0.1"`, so exposing a service publicly requires an explicit
-`0.0.0.0` bind in its compose file.
+**Container port bindings are always explicit.** Every published port in a
+compose file states its bind address (`127.0.0.1`, a tunnel address, or
+`0.0.0.0`) — bare `port:port` mappings are forbidden, because Compose fills
+in `0.0.0.0` itself rather than deferring to the daemon's default bind
+address. Docker's `daemon.json` still sets `"ip": "127.0.0.1"` as a backstop
+for anything started outside compose.
 
 **Host firewall covers FORWARD and INPUT.** Traffic to published
 container ports is DNAT'd and traverses the FORWARD chain; a firewall that
@@ -103,7 +106,8 @@ self-update via WP's own mechanism, driven by a real systemd timer running
 `wp cron` every 15 minutes (php-fpm's visit-triggered pseudo-cron is disabled).
 Container images track their pinned major/minor tags via `pull: always`,
 making every playbook run the image-update channel with changes visible
-in the run recap.
+in the run recap. The metrics exporters pin exact versions and update 
+by pull request instead.
 
 **Secrets never leave the vault layer.** All credentials live in an encrypted
 `group_vars/all/vault.yml`; templates reference intermediate variables, never
@@ -135,6 +139,7 @@ roles/
   wireguard/             # wg0 tunnel from vaulted keys
   nftables/              # default-drop ruleset with self-reverting rollout
   docker/                # engine (deb822 repo), daemon.json, systemd drop-ins
+  exporters/             # exporters for monitoring stack
   mariadb/               # DB stack on core, tunnel-only binding
   web/                   # nginx + WordPress + Redis, declarative TLS, timers
 ```
