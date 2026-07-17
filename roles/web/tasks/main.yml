@@ -94,13 +94,21 @@
     path: /opt/web/wordpress/wp-settings.php
     timeout: 120
 
+- name: Wait for the database over the tunnel
+  ansible.builtin.wait_for:
+    host: 10.66.0.2
+    port: 3306
+    timeout: 120
+
 - name: Check WordPress install state
   ansible.builtin.command: >-
     docker compose -f /opt/stacks/web/compose.yml run --rm -T
     wpcli wp core is-installed
   register: web_wp_installed
   changed_when: false
-  failed_when: web_wp_installed.rc not in [0, 1]
+  failed_when: >-
+    web_wp_installed.rc not in [0, 1]
+    or (web_wp_installed.rc == 1 and 'Error' in web_wp_installed.stderr)
 
 - name: Install WordPress
   ansible.builtin.command:

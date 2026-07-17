@@ -1,14 +1,17 @@
 ---
-- name: Create data and stack directories
+- name: Create stack directory
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: /opt/stacks/mariadb
     state: directory
     owner: root
     group: root
     mode: "0750"
-  loop:
-    - /opt/mariadb/data
-    - /opt/stacks/mariadb
+
+- name: Create data directory (ownership managed by the container entrypoint)
+  ansible.builtin.file:
+    path: /opt/mariadb/data
+    state: directory
+    mode: "0750"
 
 - name: Deploy compose file
   ansible.builtin.template:
@@ -25,3 +28,11 @@
     state: present
     pull: always
     remove_orphans: true
+
+- name: Wait for the database to report healthy
+  community.docker.docker_container_info:
+    name: mariadb
+  register: mariadb_info
+  until: mariadb_info.container.State.Health.Status == 'healthy'
+  retries: 30
+  delay: 5
