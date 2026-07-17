@@ -1,0 +1,25 @@
+# Managed by Ansible
+services:
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.9.1
+    container_name: node-exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    command:
+      - --path.rootfs=/rootfs
+      - --web.listen-address={{ exporters_wg_ip }}:9100
+    volumes:
+      - /:/rootfs:ro
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - "{{ exporters_wg_ip }}:8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro

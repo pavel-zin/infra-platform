@@ -64,6 +64,8 @@ services:
     restart: unless-stopped
     cap_add:
       - NET_RAW
+    ports:
+      - "10.66.0.1:8081:8080"
     volumes:
       - /opt/web/gatus:/config:ro
       - /opt/web/gatus-data:/data

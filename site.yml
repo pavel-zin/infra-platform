@@ -31,3 +31,9 @@
   become: true
   roles:
     - web
+
+- name: Metrics exporters
+  hosts: all
+  become: true
+  roles:
+    - exporters
