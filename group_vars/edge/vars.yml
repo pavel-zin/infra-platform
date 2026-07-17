@@ -9,3 +9,5 @@ web_cert_domains:
 wordpress_db_password: "{{ vault_mariadb_wp_password }}"
 wordpress_admin_user: pzin
 wordpress_admin_password: "{{ vault_wordpress_admin_password }}"
+nftables_wg_input_tcp: [9100]
+nftables_wg_forward_tcp: [8080, 8081]
