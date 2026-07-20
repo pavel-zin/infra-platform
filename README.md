@@ -26,7 +26,6 @@ flowchart LR
             nginx[nginx 1.27]
             wp[WordPress php-fpm]
             redis[(Redis 7)]
-            prom -. "scrapes over WireGuard" .-> edge
         end
         subgraph core["core1 (public: 22 only)"]
             db[(MariaDB 11.4)]
@@ -40,6 +39,8 @@ flowchart LR
     nginx -- fastcgi --> wp
     wp --- redis
     wp == "WireGuard 10.66.0.1 ⇄ 10.66.0.2" ==> db
+    prom -. "scrapes over WireGuard" .-> edge
+    graf --- prom
 ```
 
 Two firewall layers, independently default-deny:
