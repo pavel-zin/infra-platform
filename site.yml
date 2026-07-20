@@ -37,3 +37,9 @@
   become: true
   roles:
     - exporters
+
+- name: Monitoring
+  hosts: core
+  become: true
+  roles:
+    - monitoring

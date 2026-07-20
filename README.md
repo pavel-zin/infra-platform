@@ -26,9 +26,12 @@ flowchart LR
             nginx[nginx 1.27]
             wp[WordPress php-fpm]
             redis[(Redis 7)]
+            prom -. "scrapes over WireGuard" .-> edge
         end
         subgraph core["core1 (public: 22 only)"]
             db[(MariaDB 11.4)]
+            prom[Prometheus]
+            graf[Grafana]
         end
     end
 
@@ -46,7 +49,7 @@ Two firewall layers, independently default-deny:
 | Cloud | OCI Network Security Groups | 22, 80, 443 public; 51820/udp from core's NSG | 22 public; 51820/udp from edge's NSG |
 | Host | nftables (input **and** forward drop by default) | + 80/443 in FORWARD (container DNAT) | tunnel + established only |
 
-All internal traffic — database today; monitoring and backups next — use
+All internal traffic — database and monitoring today; backups next — use
 the WireGuard tunnel and binds exclusively to `10.66.0.x` addresses. Nothing
 internal is reachable from the public network.
 
@@ -109,6 +112,13 @@ making every playbook run the image-update channel with changes visible
 in the run recap. The metrics exporters pin exact versions and update 
 by pull request instead.
 
+**Monitoring is tunnel-only and provisioned as code.** Prometheus and Grafana
+run on the private core node, host-networked and bound to the WireGuard address; 
+observability images pin exact versions and update by pull request. No firewall
+ports were added: scrapes leave core over the tunnel and return as established
+traffic, and admin access is an SSH port-forward. Grafana is provisioned
+entirely from the repository.
+
 **Secrets never leave the vault layer.** All credentials live in an encrypted
 `group_vars/all/vault.yml`; templates reference intermediate variables, never
 `vault_*` names directly. Compose files that embed secrets are deployed mode
@@ -141,6 +151,7 @@ roles/
   docker/                # engine (deb822 repo), daemon.json, systemd drop-ins
   exporters/             # exporters for monitoring stack
   mariadb/               # DB stack on core, tunnel-only binding
+  monitoring/            # Prometheus + Grafana
   web/                   # nginx + WordPress + Redis, declarative TLS, timers
 ```
 

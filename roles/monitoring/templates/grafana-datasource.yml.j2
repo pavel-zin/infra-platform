@@ -1,0 +1,9 @@
+# Managed by Ansible
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://{{ monitoring_wg_ip }}:9090
+    isDefault: true
