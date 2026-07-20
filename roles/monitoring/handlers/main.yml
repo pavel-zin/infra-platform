@@ -1,0 +1,8 @@
+---
+- name: Reload prometheus
+  ansible.builtin.command: docker kill --signal HUP prometheus  # noqa: command-instead-of-module
+  changed_when: true
+
+- name: Restart grafana
+  ansible.builtin.command: docker compose -f /opt/stacks/monitoring/compose.yml restart grafana  # noqa: command-instead-of-module
+  changed_when: true

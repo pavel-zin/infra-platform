@@ -1,0 +1,6 @@
+---
+monitoring_wg_ip: "{{ wg_address.split('/')[0] }}"
+monitoring_prometheus_image: prom/prometheus:v3.5.5
+monitoring_grafana_image: grafana/grafana:12.4.5
+monitoring_retention_time: 30d
+monitoring_retention_size: 10GB

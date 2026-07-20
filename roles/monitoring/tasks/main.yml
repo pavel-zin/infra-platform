@@ -1,0 +1,112 @@
+---
+- name: Create monitoring stack directory
+  ansible.builtin.file:
+    path: /opt/stacks/monitoring
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Create Prometheus config directory
+  ansible.builtin.file:
+    path: /opt/monitoring/prometheus
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create Prometheus data directory (uid 65534 = nobody, the image's runtime user)
+  ansible.builtin.file:
+    path: /opt/monitoring/prometheus-data
+    state: directory
+    owner: "65534"
+    group: "65534"
+    mode: "0750"
+
+- name: Create Grafana provisioning directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - /opt/monitoring/grafana/provisioning/datasources
+    - /opt/monitoring/grafana/provisioning/dashboards
+    - /opt/monitoring/grafana/dashboards
+
+- name: Create Grafana data directory (uid 472 = grafana, the image's runtime user)
+  ansible.builtin.file:
+    path: /opt/monitoring/grafana-data
+    state: directory
+    owner: "472"
+    group: "472"
+    mode: "0750"
+
+- name: Deploy Prometheus configuration
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /opt/monitoring/prometheus/prometheus.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload prometheus
+
+- name: Deploy Grafana datasource provisioning
+  ansible.builtin.template:
+    src: grafana-datasource.yml.j2
+    dest: /opt/monitoring/grafana/provisioning/datasources/prometheus.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart grafana
+
+- name: Deploy Grafana dashboard provider
+  ansible.builtin.copy:
+    src: grafana-dashboards.yml
+    dest: /opt/monitoring/grafana/provisioning/dashboards/dashboards.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart grafana
+
+- name: Deploy Grafana dashboards
+  ansible.builtin.copy:
+    src: dashboards/
+    dest: /opt/monitoring/grafana/dashboards/
+    owner: root
+    group: root
+    mode: "0644"
+    directory_mode: "0755"
+
+- name: Deploy compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: /opt/stacks/monitoring/compose.yml
+    owner: root
+    group: root
+    mode: "0600"
+  diff: false
+
+- name: Start monitoring stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/stacks/monitoring
+    state: present
+    pull: always
+    remove_orphans: true
+
+- name: Wait for Prometheus to report ready
+  ansible.builtin.uri:
+    url: "http://{{ monitoring_wg_ip }}:9090/-/ready"
+  register: monitoring_prom_ready
+  until: monitoring_prom_ready.status == 200
+  retries: 12
+  delay: 5
+
+- name: Wait for Grafana to report healthy
+  ansible.builtin.uri:
+    url: "http://{{ monitoring_wg_ip }}:3000/api/health"
+  register: monitoring_grafana_health
+  until: monitoring_grafana_health.status == 200
+  retries: 12
+  delay: 5

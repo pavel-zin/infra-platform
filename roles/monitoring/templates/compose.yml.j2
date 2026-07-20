@@ -1,0 +1,35 @@
+# Managed by Ansible
+services:
+  prometheus:
+    image: {{ monitoring_prometheus_image }}
+    container_name: prometheus
+    restart: unless-stopped
+    network_mode: host
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time={{ monitoring_retention_time }}
+      - --storage.tsdb.retention.size={{ monitoring_retention_size }}
+      - --web.listen-address={{ monitoring_wg_ip }}:9090
+    volumes:
+      - /opt/monitoring/prometheus:/etc/prometheus:ro
+      - /opt/monitoring/prometheus-data:/prometheus
+
+  grafana:
+    image: {{ monitoring_grafana_image }}
+    container_name: grafana
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - prometheus
+    environment:
+      GF_SERVER_HTTP_ADDR: "{{ monitoring_wg_ip }}"
+      GF_SERVER_HTTP_PORT: "3000"
+      GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - /opt/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - /opt/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - /opt/monitoring/grafana-data:/var/lib/grafana
