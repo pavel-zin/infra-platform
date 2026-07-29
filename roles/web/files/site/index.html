@@ -8,21 +8,38 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='5' fill='%231a7f37'/></svg>">
 <style>
   :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
     --ink: #16191d;
     --muted: #57606a;
     --line: #d8dee4;
     --panel: #f6f8fa;
     --green: #1a7f37;
     --link: #0757ba;
+    --mark: #fff3c2;
     --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, "Liberation Mono", monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* Follows the operating system setting; no toggle, no JavaScript. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117;
+      --ink: #e6edf3;
+      --muted: #9198a1;
+      --line: #30363d;
+      --panel: #161b22;
+      --green: #3fb950;
+      --link: #79b8ff;
+      --mark: #453a10;
+    }
   }
 
   * { box-sizing: border-box; }
 
   body {
     margin: 0;
-    background: #ffffff;
+    background: var(--bg);
     color: var(--ink);
     font-family: var(--sans);
     font-size: 1rem;
@@ -36,7 +53,7 @@
   }
 
   a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 2px; }
-  a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 2px; }
+  a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 
   /* ---- header ---- */
   .name {
@@ -51,33 +68,24 @@
     font-size: 1.1rem;
     color: var(--muted);
   }
-  .contact {
-    margin: 1rem 0 0;
-    padding: 0;
-    list-style: none;
-    font-family: var(--mono);
-    font-size: 0.82rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.4rem;
-  }
-  .contact li { white-space: nowrap; }
 
-  /* ---- systemd hero ---- */
-  .unit-status {
+  /* ---- availability ---- */
+  .availability {
     margin: 2rem 0 0;
-    padding: 1rem 1.25rem;
+    padding: 0.9rem 1.15rem;
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 6px;
-    font-family: var(--mono);
-    font-size: 0.82rem;
-    line-height: 1.6;
-    overflow-x: auto;
+    border-left: 3px solid var(--green);
   }
-  .unit-status pre { margin: 0; }
+  .availability p { margin: 0; }
+  .availability-line { font-size: 1rem; line-height: 1.5; }
+  .availability-meta {
+    margin-top: 0.35rem !important;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
   .dot { color: var(--green); }
-  .running { color: var(--green); font-weight: 600; }
 
   /* ---- sections ---- */
   section { margin-top: 2.6rem; }
@@ -130,7 +138,6 @@
     height: auto;
     display: block;
     border: 1px solid var(--line);
-    border-radius: 6px;
   }
   /* Compact until a real screenshot replaces it, so empty boxes do not
      dominate the page. */
@@ -142,7 +149,6 @@
     min-height: 2.4rem;
     padding: 0.5rem 0.7rem;
     border: 1px dashed var(--line);
-    border-radius: 6px;
     background: var(--panel);
     font-family: var(--mono);
     font-size: 0.72rem;
@@ -159,8 +165,7 @@
 
   /* ---- placeholders you must replace ---- */
   .fill {
-    background: #fff3c2;
-    border-radius: 3px;
+    background: var(--mark);
     padding: 0 0.2em;
   }
 
@@ -178,13 +183,25 @@
   @media (max-width: 480px) {
     .page { padding-top: 2.25rem; }
     .name { font-size: 1.7rem; }
-    .unit-status { font-size: 0.72rem; padding: 0.8rem 0.9rem; }
+    .availability { padding: 0.8rem 0.9rem; }
+    .availability-line { font-size: 0.95rem; }
     .shots { grid-template-columns: 1fr; }
   }
 
   @media print {
+    /* Print on paper, never in the dark palette. */
+    :root {
+      --bg: #ffffff;
+      --ink: #16191d;
+      --muted: #57606a;
+      --line: #d8dee4;
+      --panel: #f6f8fa;
+      --green: #1a7f37;
+      --link: #0757ba;
+      --mark: #fff3c2;
+    }
     .page { max-width: none; padding: 0; }
-    .unit-status { border-color: #bbb; }
+    .availability { border-color: #bbb; border-left-color: #bbb; }
     a { color: var(--ink); text-decoration: none; }
     footer { display: none; }
   }
@@ -196,20 +213,14 @@
   <header>
     <h1 class="name">Pavel Zinurov</h1>
     <p class="role">Infrastructure / DevOps / Systems student at École 42</p>
-    <ul class="contact">
-      <li>Paris, Île-de-France</li>
-      <li><a href="mailto:pavel.zinurov.contacts@gmail.com">pavel.zinurov.contacts@gmail.com</a></li>
-      <li><a href="https://github.com/pavel-zin" rel="me">github.com/pavel-zin</a></li>
-    </ul>
   </header>
 
-  <div class="unit-status" role="img" aria-label="Availability, styled as a systemd status block: active and seeking a 4 to 6 month internship or an alternance">
-<pre><span class="dot">●</span> pavel-zinurov.service
-     Loaded: loaded (Paris, Île-de-France; <b>enabled</b>)
-     Active: <span class="running">active (running)</span>
-       Docs: https://github.com/pavel-zin/infra-platform
-     Status: "Seeking an internship / work experience (4-6 months)
-              or an alternance"</pre>
+  <div class="availability">
+    <p class="availability-line"><span class="dot" aria-hidden="true">●</span>
+    <strong>Available now</strong> — seeking a 4–6 month internship (stage)
+    or an alternance in infrastructure, DevOps or systems engineering.</p>
+    <p class="availability-meta">Paris, Île-de-France ·
+    <a href="mailto:pavel.zinurov.contacts@gmail.com">pavel.zinurov.contacts@gmail.com</a></p>
   </div>
 
   <section>
@@ -226,7 +237,7 @@
   </section>
 
   <section>
-    <h2>infrastructure</h2>
+    <h2>infrastructure &amp; operations</h2>
 
     <div class="item">
       <div class="item-head">
@@ -243,10 +254,6 @@
         <a href="img/grafana.png"><img src="img/grafana.png" alt="Grafana dashboard" loading="lazy"></a>
       </div>
     </div>
-  </section>
-
-  <section>
-    <h2>projects</h2>
 
     <div class="item">
       <div class="item-head">
@@ -292,6 +299,10 @@
         <div class="shot-placeholder">screenshot — img/transcendence.png</div>
       </div>
     </div>
+  </section>
+
+  <section>
+    <h2>systems programming — c / c++</h2>
 
     <div class="item">
       <div class="item-head">
@@ -327,11 +338,6 @@
       </div>
     </div>
 
-  </section>
-
-  <section>
-    <h2>c / c++</h2>
-
     <div class="item">
       <div class="item-head">
         <span class="item-title">ft_printf — printf reimplemented as a static library</span>
@@ -362,15 +368,6 @@
       comparison count near the theoretical minimum. Everything builds under
       <code>-Wall -Wextra -Werror</code>.
       — <a href="https://github.com/pavel-zin?tab=repositories&amp;q=CPP" rel="me">CPP-00 … CPP-09</a></p>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">Also in C</span>
-        <span class="item-meta">2024</span>
-      </div>
-      <p>The wireframe renderer and the sorting solver above are both plain C
-      against a minimal graphics library and the standard library only.</p>
     </div>
   </section>
 
