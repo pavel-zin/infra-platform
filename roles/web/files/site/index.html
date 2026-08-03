@@ -139,21 +139,6 @@
     display: block;
     border: 1px solid var(--line);
   }
-  /* Compact until a real screenshot replaces it, so empty boxes do not
-     dominate the page. */
-  .shot-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    min-height: 2.4rem;
-    padding: 0.5rem 0.7rem;
-    border: 1px dashed var(--line);
-    background: var(--panel);
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--muted);
-  }
 
   /* ---- skills line ---- */
   .skills-line {
@@ -161,12 +146,6 @@
     font-family: var(--mono);
     font-size: 0.86rem;
     line-height: 1.9;
-  }
-
-  /* ---- placeholders you must replace ---- */
-  .fill {
-    background: var(--mark);
-    padding: 0 0.2em;
   }
 
   /* ---- footer ---- */
@@ -265,9 +244,6 @@
       automatic Let's Encrypt certificates, plus monitoring and an admin
       interface. Roles are idempotent and all credentials are vault-encrypted.
       — <a href="https://github.com/pavel-zin/cloud-1" rel="me">github.com/pavel-zin/cloud-1</a></p>
-      <div class="shots single">
-        <div class="shot-placeholder">screenshot — img/cloud1.png</div>
-      </div>
     </div>
 
     <div class="item">
@@ -280,9 +256,6 @@
       Ingress, and a K3d cluster where Argo CD continuously syncs an application
       from a Git repository.
       — <a href="https://github.com/pavel-zin/IoT" rel="me">github.com/pavel-zin/IoT</a></p>
-      <div class="shots single">
-        <div class="shot-placeholder">screenshot — img/iot.png</div>
-      </div>
     </div>
 
     <div class="item">
@@ -295,9 +268,6 @@
       client, and everything behind nginx via Docker Compose, with an ELK stack
       and monitoring alongside it.
       — <a href="https://github.com/pavel-zin/transcendence" rel="me">github.com/pavel-zin/transcendence</a></p>
-      <div class="shots single">
-        <div class="shot-placeholder">screenshot — img/transcendence.png</div>
-      </div>
     </div>
   </section>
 
@@ -314,11 +284,8 @@
       against a minimal graphics library — no engine, no maths library.
       — <a href="https://github.com/pavel-zin/FdF" rel="me">github.com/pavel-zin/FdF</a></p>
       <div class="shots">
-        <!-- once the repo is public, replace both placeholders with:
         <a href="https://github.com/pavel-zin/FdF"><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.gif" alt="FdF rotating a wireframe mesh" loading="lazy"></a>
-        <a href="https://github.com/pavel-zin/FdF"><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.png" alt="Isometric wireframe of a height map" loading="lazy"></a> -->
-        <div class="shot-placeholder">recording — FdF/img/fdf.gif</div>
-        <div class="shot-placeholder">render — FdF/img/fdf.png</div>
+        <a href="https://github.com/pavel-zin/FdF"><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.png" alt="Isometric wireframe of a height map" loading="lazy"></a>
       </div>
     </div>
 
@@ -332,9 +299,7 @@
       values, 5600 for 500.
       — <a href="https://github.com/pavel-zin/push_swap" rel="me">github.com/pavel-zin/push_swap</a></p>
       <div class="shots single">
-        <!-- once public:
-        <a href="https://github.com/pavel-zin/push_swap"><img src="https://raw.githubusercontent.com/pavel-zin/push_swap/master/img/push_swap.gif" alt="Visualizer replaying a push_swap sort" loading="lazy"></a> -->
-        <div class="shot-placeholder">recording — push_swap/img/push_swap.gif</div>
+        <a href="https://github.com/pavel-zin/push_swap"><img src="https://raw.githubusercontent.com/pavel-zin/push_swap/master/img/push_swap.gif" alt="Visualizer replaying a push_swap sort" loading="lazy"></a>
       </div>
     </div>
 
@@ -384,11 +349,8 @@
       income against life expectancy on a log scale.
       — <a href="https://github.com/pavel-zin/Python-2" rel="me">github.com/pavel-zin/Python-2</a></p>
       <div class="shots">
-        <!-- once public:
         <a href="https://github.com/pavel-zin/Python-2"><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex01.png" alt="Life expectancy plotted over time" loading="lazy"></a>
-        <a href="https://github.com/pavel-zin/Python-2"><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex03.png" alt="Income against life expectancy, log scale" loading="lazy"></a> -->
-        <div class="shot-placeholder">chart — Python-2/img/ex01.png</div>
-        <div class="shot-placeholder">chart — Python-2/img/ex03.png</div>
+        <a href="https://github.com/pavel-zin/Python-2"><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex03.png" alt="Income against life expectancy, log scale" loading="lazy"></a>
       </div>
     </div>
 
@@ -402,9 +364,7 @@
       transposition, greyscale and per-channel colour filters.
       — <a href="https://github.com/pavel-zin/Python-1" rel="me">github.com/pavel-zin/Python-1</a></p>
       <div class="shots single">
-        <!-- once public:
-        <a href="https://github.com/pavel-zin/Python-1"><img src="https://raw.githubusercontent.com/pavel-zin/Python-1/master/img/ex05.png" alt="Colour channel transforms of a photograph" loading="lazy"></a> -->
-        <div class="shot-placeholder">transforms — Python-1/img/ex05.png</div>
+        <a href="https://github.com/pavel-zin/Python-1"><img src="https://raw.githubusercontent.com/pavel-zin/Python-1/master/img/ex05.png" alt="Colour channel transforms of a photograph" loading="lazy"></a>
       </div>
     </div>
 
@@ -455,7 +415,7 @@
   <footer>
     <p>This page is served by the infrastructure it describes: nginx on
     Cloud, deployed by Ansible from a Git repository.<br>
-    No JavaScript, no cookies, no third-party requests.</p>
+    No JavaScript, no cookies.</p>
   </footer>
 
 </div>
