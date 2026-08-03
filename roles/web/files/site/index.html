@@ -88,23 +88,23 @@
   .dot { color: var(--green); }
 
   /* ---- sections ---- */
-  section { margin-top: 2.6rem; }
+  section { margin-top: 2rem; }
   h2 {
-    margin: 0 0 0.9rem;
+    margin: 0 0 0.7rem;
     font-family: var(--mono);
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     color: var(--muted);
     border-bottom: 1px solid var(--line);
-    padding-bottom: 0.45rem;
+    padding-bottom: 0.4rem;
   }
   h2::before { content: "["; }
   h2::after  { content: "]"; }
 
-  p { margin: 0 0 0.8rem; }
+  p { margin: 0 0 0.6rem; }
 
-  .item { margin-bottom: 1.6rem; }
+  .item { margin-bottom: 1.1rem; }
   .item:last-child { margin-bottom: 0; }
   .item-head {
     display: flex;
@@ -130,9 +130,9 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.6rem;
-    margin: 0.7rem 0 0;
+    margin: 0.5rem 0 0;
+    max-width: 30rem;
   }
-  .shots.single { grid-template-columns: 1fr; }
   .shots img {
     width: 100%;
     height: auto;
@@ -164,7 +164,6 @@
     .name { font-size: 1.7rem; }
     .availability { padding: 0.8rem 0.9rem; }
     .availability-line { font-size: 0.95rem; }
-    .shots { grid-template-columns: 1fr; }
   }
 
   @media print {
@@ -298,7 +297,7 @@
       stacks, emitting as few instructions as possible — around 620 for 100
       values, 5600 for 500.
       — <a href="https://github.com/pavel-zin/push_swap" rel="me">github.com/pavel-zin/push_swap</a></p>
-      <div class="shots single">
+      <div class="shots">
         <a href="https://github.com/pavel-zin/push_swap"><img src="https://raw.githubusercontent.com/pavel-zin/push_swap/master/img/push_swap.gif" alt="Visualizer replaying a push_swap sort" loading="lazy"></a>
       </div>
     </div>
@@ -363,7 +362,7 @@
       transforms written against the raw array — crop and zoom, rotation by
       transposition, greyscale and per-channel colour filters.
       — <a href="https://github.com/pavel-zin/Python-1" rel="me">github.com/pavel-zin/Python-1</a></p>
-      <div class="shots single">
+      <div class="shots">
         <a href="https://github.com/pavel-zin/Python-1"><img src="https://raw.githubusercontent.com/pavel-zin/Python-1/master/img/ex05.png" alt="Colour channel transforms of a photograph" loading="lazy"></a>
       </div>
     </div>
