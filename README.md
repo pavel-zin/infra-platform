@@ -34,6 +34,8 @@ flowchart LR
         end
     end
 
+    bucket[("OCI Object Storage<br/>encrypted restic repo")]
+
     clients -- "80/443" --> nginx
     le -. "ACME HTTP-01" .-> nginx
     nginx -- fastcgi --> wp
@@ -41,6 +43,8 @@ flowchart LR
     wp == "WireGuard 10.66.0.1 ⇄ 10.66.0.2" ==> db
     prom -. "scrapes over WireGuard" .-> edge
     graf --- prom
+    edge -. "nightly restic · 443 out" .-> bucket
+    core -. "nightly restic · 443 out" .-> bucket
 ```
 
 Two firewall layers, independently default-deny:
