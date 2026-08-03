@@ -7,7 +7,7 @@ a public **edge** node serving web workloads and an internal **core** node
 serving the database, connected by an encrypted WireGuard overlay. A bare
 Ubuntu instance becomes a fully configured node — hardened SSH, default-drop
 firewall, Docker runtime, application stacks, TLS certificates, scheduled
-maintenance — in a single playbook run.
+maintenance, encrypted offsite backups — in a single playbook run.
 
 Everything is code: playbook runs are idempotent, and manual changes
 are treated as drift to be erased by the next run.
@@ -34,6 +34,8 @@ flowchart LR
         end
     end
 
+    bucket[("OCI Object Storage<br/>encrypted restic repo")]
+
     clients -- "80/443" --> nginx
     le -. "ACME HTTP-01" .-> nginx
     nginx -- fastcgi --> wp
@@ -41,6 +43,8 @@ flowchart LR
     wp == "WireGuard 10.66.0.1 ⇄ 10.66.0.2" ==> db
     prom -. "scrapes over WireGuard" .-> edge
     graf --- prom
+    edge -. "nightly restic · 443 out" .-> bucket
+    core -. "nightly restic · 443 out" .-> bucket
 ```
 
 Two firewall layers, independently default-deny:
@@ -50,11 +54,13 @@ Two firewall layers, independently default-deny:
 | Cloud | OCI Network Security Groups | 22, 80, 443 public; 51820/udp from core's NSG | 22 public; 51820/udp from edge's NSG |
 | Host | nftables (input **and** forward drop by default) | + 80/443 in FORWARD (container DNAT) | tunnel + established only |
 
-All internal traffic — database and monitoring today; backups next — use
-the WireGuard tunnel and binds exclusively to `10.66.0.x` addresses. Nothing
-internal is reachable from the public network.
+All internal traffic — database and monitoring — uses the WireGuard tunnel
+and binds exclusively to `10.66.0.x` addresses. Nothing internal is reachable
+from the public network. Backups add no inbound surface either: both nodes
+push client-side-encrypted snapshots to object storage over outbound
+HTTPS only.
 
-## Design decisions
+## Design
 
 **Container port bindings are always explicit.** Every published port in a
 compose file states its bind address (`127.0.0.1`, a tunnel address, or
@@ -110,15 +116,23 @@ self-update via WP's own mechanism, driven by a real systemd timer running
 `wp cron` every 15 minutes (php-fpm's visit-triggered pseudo-cron is disabled).
 Container images track their pinned major/minor tags via `pull: always`,
 making every playbook run the image-update channel with changes visible
-in the run recap. The metrics exporters pin exact versions and update 
+in the run recap. The metrics exporters pin exact versions and update
 by pull request instead.
 
 **Monitoring is tunnel-only and provisioned as code.** Prometheus and Grafana
-run on the private core node, host-networked and bound to the WireGuard address; 
+run on the private core node, host-networked and bound to the WireGuard address;
 observability images pin exact versions and update by pull request. No firewall
 ports were added: scrapes leave core over the tunnel and return as established
 traffic, and admin access is an SSH port-forward. Grafana is provisioned
 entirely from the repository.
+
+**Backups are restic to object storage, and the restore is the test.**
+Nightly systemd timers push the data layer offsite: a consistent MariaDB
+logical dump on core; the WordPress tree and the Let's Encrypt directory
+on edge. Restic encrypts and deduplicates client-side before anything
+reaches the OCI bucket. Configuration is deliberately not backed up - it
+rebuilds from this repository and caches and metrics history regenerate.
+Retention is 7 daily + 4 weekly snapshots, pruned and checked weekly.
 
 **Secrets never leave the vault layer.** All credentials live in an encrypted
 `group_vars/all/vault.yml`; templates reference intermediate variables, never
@@ -136,7 +150,8 @@ secrets at runtime.
 
 ```
 .github/workflows/       # CI: lint on push/PR · CD: deploy on dispatch
-site.yml                 # base → firewall (serial) → runtime → db (core) → web (edge)
+site.yml                 # base → firewall (serial) → runtime → db (core) →
+                         #   web (edge) → exporters → monitoring (core) → backups
 inventory.example.yml    # sanitized inventory shape; real inventory is gitignored
 requirements.yml         # Ansible collections
 requirements.txt         # Python toolchain (ansible, ansible-lint)
@@ -153,13 +168,15 @@ roles/
   exporters/             # exporters for monitoring stack
   mariadb/               # DB stack on core, tunnel-only binding
   monitoring/            # Prometheus + Grafana
+  backup/                # restic → OCI object storage
   web/                   # nginx + WordPress + Redis, declarative TLS, timers
 ```
 
 ## Quickstart
 
-Requires two Ubuntu 24.04 hosts reachable over SSH and a domain with A
-records pointing at the edge node's public IP.
+Requires two Ubuntu 24.04 hosts reachable over SSH, a domain with A
+records pointing at the edge node's public IP, and an OCI Object Storage
+bucket with a Customer Secret Key (S3-compatible credentials) for backups.
 
 ```bash
 python3 -m venv .venv_ansible && source .venv_ansible/bin/activate
@@ -176,8 +193,12 @@ ansible-vault create group_vars/all/vault.yml
 The vault must define: `vault_wg_private_key_edge`,
 `vault_wg_private_key_core` (from `wg genkey`; put the matching public keys
 in `group_vars/all/vars.yml`), `vault_mariadb_root_password`,
-`vault_mariadb_wp_password`, `vault_wordpress_admin_password`. Set `domain`,
-`certbot_email`, and `web_cert_domains` for your environment.
+`vault_mariadb_wp_password`, `vault_wordpress_admin_password`,
+`vault_grafana_admin_password`, and for backups `vault_restic_password`,
+`vault_oci_s3_access_key`, `vault_oci_s3_secret_key`,
+`vault_backup_s3_bucket`, `vault_backup_s3_namespace`,
+`vault_backup_s3_region`. Set `domain`, `certbot_email`, and
+`web_cert_domains` for your environment.
 
 ```bash
 ansible-lint            # lints clean
@@ -199,6 +220,7 @@ ssh edge1 'cd /opt/stacks/web && sudo docker compose run --rm -T \
   wpcli wp core is-installed && echo ok'         # checks the container→DB path
 ssh edge1 'sudo docker exec redis redis-cli info keyspace'   # object cache populated
 ssh edge1 'systemctl list-timers | grep -E "certbot|wp-cron"'
+ssh core1 'sudo restic-wrap snapshots | tail -5'             # both hosts' backups
 ```
 
 The firewall/runtime integration test — restart the firewall and confirm
@@ -206,4 +228,33 @@ the public ports return without manual intervention:
 
 ```bash
 ssh edge1 'sudo systemctl restart nftables' && sleep 30 && curl -I https://<domain>
+```
+
+Backups restoration test: the dump is imported into a throwaway database and
+files are compared against a scratch restore.
+
+```bash
+# core: the database comes back, end to end
+sudo install -d -m 700 /tmp/drill
+sudo restic-wrap restore latest --host core1 --target /tmp/drill
+sudo docker run --rm -d --name drilldb -e MARIADB_ROOT_PASSWORD=drill mariadb:11.4
+until sudo docker exec -e MYSQL_PWD=drill drilldb mariadb -uroot -e 'SELECT 1' \
+  >/dev/null 2>&1; do sleep 2; done
+sudo docker cp /tmp/drill/opt/backups/db/all-databases.sql drilldb:/tmp/dump.sql
+sudo docker exec -e MYSQL_PWD=drill drilldb sh -c 'mariadb -uroot < /tmp/dump.sql'
+sudo docker exec -e MYSQL_PWD=drill drilldb mariadb -uroot wordpress \
+  -e "SELECT option_value FROM wp_options WHERE option_name='siteurl';"
+                                                 # expect https://blog.<domain>
+sudo docker stop drilldb && sudo rm -rf /tmp/drill
+```
+
+```bash
+# edge: restored files are byte-identical, including the certificate chain
+sudo install -d -m 700 /tmp/drill
+sudo restic-wrap restore latest --host edge1 --target /tmp/drill
+f=/opt/web/wordpress/wp-config.php
+sudo cmp "$f" "/tmp/drill$f" && echo IDENTICAL
+c=$(sudo find /opt/web/certbot/conf/live -name fullchain.pem | head -n 1)
+sudo cmp "$c" "/tmp/drill$c" && echo IDENTICAL
+sudo rm -rf /tmp/drill
 ```

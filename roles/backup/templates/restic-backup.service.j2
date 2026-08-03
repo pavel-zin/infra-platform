@@ -1,0 +1,15 @@
+[Unit]
+Description=restic backup ({{ inventory_hostname }})
+Wants=network-online.target
+After=network-online.target
+{% if backup_db_dump %}
+Wants=docker.service
+After=docker.service
+{% endif %}
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/restic-backup.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7

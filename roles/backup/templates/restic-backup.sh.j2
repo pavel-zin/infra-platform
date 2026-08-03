@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Managed by Ansible
+set -euo pipefail
+umask 077
+
+{% if backup_db_dump %}
+# Logical dump: --single-transaction = one consistent InnoDB snapshot, no locks;
+# --quick streams rows (1 GB VM). Password via env only — argv is world-readable in /proc.
+set -a
+. /etc/restic/db.env
+set +a
+docker exec -e MYSQL_PWD {{ backup_db_container }} \
+  mariadb-dump --all-databases --single-transaction --quick \
+  > /opt/backups/db/all-databases.sql.tmp
+mv /opt/backups/db/all-databases.sql.tmp /opt/backups/db/all-databases.sql
+{% endif %}
+
+restic-wrap backup {{ backup_paths | join(' ') }}

@@ -1,0 +1,4 @@
+---
+backup_paths:
+  - /opt/web/wordpress
+  - /opt/web/certbot/conf

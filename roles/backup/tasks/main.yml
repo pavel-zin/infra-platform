@@ -1,0 +1,137 @@
+---
+- name: Install restic
+  ansible.builtin.apt:
+    name: restic
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Create restic config directory
+  ansible.builtin.file:
+    path: /etc/restic
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Create restic cache directory
+  ansible.builtin.file:
+    path: /var/cache/restic
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Template restic environment file
+  ansible.builtin.template:
+    src: restic.env.j2
+    dest: /etc/restic/restic.env
+    owner: root
+    group: root
+    mode: '0600'
+  no_log: true
+
+- name: Template database dump environment file
+  ansible.builtin.template:
+    src: db.env.j2
+    dest: /etc/restic/db.env
+    owner: root
+    group: root
+    mode: '0600'
+  no_log: true
+  when: backup_db_dump
+
+- name: Create database dump directory
+  ansible.builtin.file:
+    path: /opt/backups/db
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  when: backup_db_dump
+
+- name: Install restic wrapper
+  ansible.builtin.copy:
+    src: restic-wrap
+    dest: /usr/local/bin/restic-wrap
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Template backup script
+  ansible.builtin.template:
+    src: restic-backup.sh.j2
+    dest: /usr/local/bin/restic-backup.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Template prune script
+  ansible.builtin.template:
+    src: restic-prune.sh.j2
+    dest: /usr/local/bin/restic-prune.sh
+    owner: root
+    group: root
+    mode: '0755'
+  when: backup_prune_node
+
+- name: Template backup service unit
+  ansible.builtin.template:
+    src: restic-backup.service.j2
+    dest: /etc/systemd/system/restic-backup.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
+
+- name: Template backup timer unit
+  ansible.builtin.template:
+    src: restic-backup.timer.j2
+    dest: /etc/systemd/system/restic-backup.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
+
+- name: Template prune service unit
+  ansible.builtin.template:
+    src: restic-prune.service.j2
+    dest: /etc/systemd/system/restic-prune.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
+  when: backup_prune_node
+
+- name: Template prune timer unit
+  ansible.builtin.template:
+    src: restic-prune.timer.j2
+    dest: /etc/systemd/system/restic-prune.timer
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
+  when: backup_prune_node
+
+- name: Flush handlers before repository and timer work
+  ansible.builtin.meta: flush_handlers
+
+- name: Initialise restic repository if absent
+  ansible.builtin.shell: restic-wrap cat config >/dev/null 2>&1 || restic-wrap init
+  register: backup_repo_init
+  changed_when: "'created restic repository' in backup_repo_init.stdout"
+  run_once: true
+  no_log: true
+
+- name: Enable backup timer
+  ansible.builtin.systemd_service:
+    name: restic-backup.timer
+    enabled: true
+    state: started
+
+- name: Enable prune timer
+  ansible.builtin.systemd_service:
+    name: restic-prune.timer
+    enabled: true
+    state: started
+  when: backup_prune_node

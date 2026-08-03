@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Managed by Ansible
+set -euo pipefail
+
+restic-wrap forget --keep-daily {{ backup_keep_daily }} --keep-weekly {{ backup_keep_weekly }} --prune
+restic-wrap check

@@ -43,3 +43,9 @@
   become: true
   roles:
     - monitoring
+
+- name: Backups
+  hosts: all
+  become: true
+  roles:
+    - backup

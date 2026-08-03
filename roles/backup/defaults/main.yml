@@ -1,0 +1,8 @@
+---
+backup_paths: []
+backup_db_dump: false
+backup_db_container: mariadb
+backup_prune_node: false
+backup_keep_daily: 7
+backup_keep_weekly: 4
+backup_time: "03:30"
