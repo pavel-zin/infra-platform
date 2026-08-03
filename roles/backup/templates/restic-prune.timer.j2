@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly restic retention prune
+
+[Timer]
+OnCalendar=Sun *-*-* 05:15:00
+RandomizedDelaySec=600
+Persistent=true
+
+[Install]
+WantedBy=timers.target

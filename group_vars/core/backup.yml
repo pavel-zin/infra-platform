@@ -1,0 +1,6 @@
+---
+backup_db_dump: true
+backup_db_root_password: "{{ vault_mariadb_root_password }}"
+backup_paths:
+  - /opt/backups/db
+backup_prune_node: true
