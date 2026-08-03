@@ -116,20 +116,12 @@
 - name: Flush handlers before repository and timer work
   ansible.builtin.meta: flush_handlers
 
-- name: Detect initialised restic repository
-  ansible.builtin.shell: set -a && . /etc/restic/restic.env && set +a && restic cat config
-  register: backup_repo_check
-  changed_when: false
-  failed_when: false
+- name: Initialise restic repository if absent
+  ansible.builtin.shell: restic-wrap cat config >/dev/null 2>&1 || restic-wrap init
+  register: backup_repo_init
+  changed_when: "'created restic repository' in backup_repo_init.stdout"
+  run_once: true
   no_log: true
-  throttle: 1
-
-- name: Initialise restic repository
-  ansible.builtin.shell: set -a && . /etc/restic/restic.env && set +a && restic init
-  when: backup_repo_check.rc != 0
-  changed_when: true
-  no_log: true
-  throttle: 1
 
 - name: Enable backup timer
   ansible.builtin.systemd_service:
