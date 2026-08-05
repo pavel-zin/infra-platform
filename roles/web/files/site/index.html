@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pavel Zinurov — Portfolio</title>
-<meta name="description" content="Infrastructure / DevOps / Systems student at 42 Paris. Seeking a 4-6 month internship or an alternance.">
+<title>Pavel ZINUROV - Infrastructure / DevOps - Paris</title>
+<meta name="description" content="Infrastructure / DevOps student at 42 Paris. Seeking a 4-6 month internship in infrastructure, DevOps or systems administration.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='5' fill='%231a7f37'/></svg>">
 <style>
   :root {
@@ -47,7 +47,7 @@
   }
 
   .page {
-    max-width: 44rem;
+    max-width: 64rem;
     margin: 0 auto;
     padding: 3.5rem 1.25rem 2rem;
   }
@@ -120,35 +120,60 @@
     color: var(--muted);
   }
   .item ul {
-    margin: 0.3rem 0 0;
+    margin: 0.3rem 0 0.5rem;
     padding-left: 1.15rem;
   }
   .item li { margin-bottom: 0.3rem; }
 
   /* ---- screenshots ---- */
-  .shots {
+  /* ---- preview grid ---- */
+  .section-note { margin: -0.35rem 0 1rem; font-family: var(--mono);
+                  font-size: 0.75rem; color: var(--muted); }
+  .grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem;
-    margin: 0.5rem 0 0;
-    max-width: 30rem;
+    grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+    gap: 1rem;
   }
-  .shots img {
-    width: 100%;
-    height: auto;
-    display: block;
+  .card {
     border: 1px solid var(--line);
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
-
-  /* ---- skills line ---- */
-  .skills-line {
-    margin: 0;
-    font-family: var(--mono);
-    font-size: 0.86rem;
-    line-height: 1.9;
+  .card.wide { grid-column: 1 / -1; }
+  .card .thumb { display: block; line-height: 0; border-bottom: 1px solid var(--line); }
+  .card .thumb img {
+    width: 100%;
+    height: 11rem;
+    object-fit: contain;      /* whole frame, never cropped */
+    background: var(--bg);
+    display: block;
   }
+  .card.wide .thumbs { display: flex; border-bottom: 1px solid var(--line); }
+  .card.wide .thumbs a { flex: 1; line-height: 0; }
+  .card.wide .thumbs a + a { border-left: 1px solid var(--line); }
+  .card.wide .thumbs img { width: 100%; height: 13rem; object-fit: contain;
+                           background: var(--bg); display: block; }
+  .card .body { padding: 0.75rem 0.9rem 0.85rem; }
+  .card h3 { margin: 0 0 0.15rem; font-size: 1rem; font-weight: 600; }
+  .card .meta { margin: 0 0 0.45rem; font-family: var(--mono);
+                font-size: 0.73rem; color: var(--muted); }
+  .card p { margin: 0 0 0.5rem; font-size: 0.94rem; }
+  .card .repo { margin: 0; font-family: var(--mono); font-size: 0.75rem; }
+  .card ul { margin: 0.2rem 0 0.6rem; padding-left: 1.1rem; font-size: 0.94rem; }
+  .card li { margin-bottom: 0.25rem; }
+  .enlarge { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
 
-  /* ---- footer ---- */
+  /* ---- lightbox: pure CSS via :target — no JavaScript ---- */
+  .lightbox { position: fixed; inset: 0; display: none; z-index: 10;
+              background: rgba(0,0,0,.9); padding: 1.5rem; text-align: center; overflow: auto; }
+  .lightbox:target { display: block; }
+  .lightbox img { max-width: 100%; height: auto; border: 1px solid #444; background: #fff; }
+  .lightbox .backdrop { position: fixed; inset: 0; }
+  .lightbox .close { position: fixed; top: .4rem; right: 1rem; color: #fff;
+                     font-family: var(--mono); font-size: 1.7rem; text-decoration: none; }
+
   footer {
     margin-top: 3rem;
     padding-top: 1rem;
@@ -179,6 +204,9 @@
       --mark: #fff3c2;
     }
     .page { max-width: none; padding: 0; }
+    .card { break-inside: avoid; }
+    .card-body { display: block !important; }
+    .lightbox { display: none !important; }
     .availability { border-color: #bbb; border-left-color: #bbb; }
     a { color: var(--ink); text-decoration: none; }
     footer { display: none; }
@@ -189,234 +217,223 @@
 <div class="page">
 
   <header>
-    <h1 class="name">Pavel Zinurov</h1>
-    <p class="role">Infrastructure / DevOps / Systems student at École 42</p>
+    <h1 class="name">Pavel ZINUROV</h1>
+    <p class="role">Infrastructure / DevOps student at École 42</p>
   </header>
 
   <div class="availability">
     <p class="availability-line"><span class="dot" aria-hidden="true">●</span>
     <strong>Available now</strong> — seeking a 4–6 month internship (stage)
-    or an alternance in infrastructure, DevOps or systems engineering.</p>
+    in infrastructure, DevOps or systems administration.</p>
     <p class="availability-meta">Paris, Île-de-France ·
-    <a href="mailto:pavel.zinurov.contacts@gmail.com">pavel.zinurov.contacts@gmail.com</a></p>
+    <a href="mailto:pavel.zinurov.contacts@gmail.com">pavel.zinurov.contacts@gmail.com</a> ·
+    <a href="/Pavel_Zinurov_CV_web.pdf">CV (PDF)</a></p>
   </div>
 
   <section>
     <h2>profile</h2>
     <p>Student at 42 Paris, systems and networks track. I'm interested in
-    designing, building and operating infrastructure like services, networking,
-    monitoring. I like privacy and free-software culture, and I run some humble
-    services that I use myself, along with a couple of other users. My dream is
-    to learn to operate such things at a bigger scale and in a specialized,
-    professional way.</p>
-    <p>Previously I studied mostly computer science and software development
-    tracks, but I switched toward infra as it seems to fit my interests
-    better.</p>
+    designing, building and operating infrastructure, including services,
+    networking, and monitoring. I like privacy and free-software culture, and I
+    run a small collection of self-hosted services for myself and a few other
+    users. My goal is to learn how to operate similar systems at a larger scale
+    and in a professional environment.</p>
   </section>
 
   <section>
     <h2>infrastructure &amp; operations</h2>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">infra-platform: two-node cloud platform, everything as code</span>
-        <span class="item-meta">2026 · Ansible / Cloud / ARM64</span>
-      </div>
-      <p>Two cloud servers managed entirely from a Git repository: one playbook
-      run turns a bare Ubuntu machine into a hardened node including firewalls,
-      an encrypted tunnel between the servers, automatic TLS, with a CI/CD
-      pipeline that lints and deploys every change.</p>
-      <p><a href="https://github.com/pavel-zin/infra-platform" rel="me">github.com/pavel-zin/infra-platform</a></p>
-      <div class="shots">
-        <a href="img/status.png"><img src="img/status.png" alt="Public status page: four monitored services, all healthy" loading="lazy"></a>
-        <a href="img/grafana.png"><img src="img/grafana.png" alt="Grafana dashboard" loading="lazy"></a>
-      </div>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">cloud-1 — automated multi-server deployment</span>
-        <span class="item-meta">2026 · Ansible · Docker · MariaDB · Redis</span>
-      </div>
-      <p>A containerized WordPress stack deployed onto cloud servers from a
-      single playbook: Docker runtime, database, Redis object cache, nginx with
-      automatic Let's Encrypt certificates, plus monitoring and an admin
-      interface. Roles are idempotent and all credentials are vault-encrypted.
-      — <a href="https://github.com/pavel-zin/cloud-1" rel="me">github.com/pavel-zin/cloud-1</a></p>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">Inception-of-Things — Kubernetes provisioning and GitOps</span>
-        <span class="item-meta">2026 · K3s · K3d · Vagrant · Argo CD</span>
-      </div>
-      <p>Cluster provisioning in three stages: a K3s server and agent built from
-      scratch in Vagrant VMs, three applications routed by hostname through an
-      Ingress, and a K3d cluster where Argo CD continuously syncs an application
-      from a Git repository.
-      — <a href="https://github.com/pavel-zin/IoT" rel="me">github.com/pavel-zin/IoT</a></p>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">transcendence — real-time multiplayer platform</span>
-        <span class="item-meta">2025–2026 · TypeScript · Docker Compose · nginx · ELK</span>
-      </div>
-      <p>A browser game served by a small platform I helped build and run: a
-      Fastify backend holding authoritative game state over WebSocket, a 3D
-      client, and everything behind nginx via Docker Compose, with an ELK stack
-      and monitoring alongside it.
-      — <a href="https://github.com/pavel-zin/transcendence" rel="me">github.com/pavel-zin/transcendence</a></p>
+    <div class="grid">
+      <article class="card wide">
+        <div class="thumbs">
+          <a href="#img-img-status-png"><img src="img/status.png" alt="Public status page" loading="lazy"></a>
+          <a href="#img-img-grafana-png"><img src="img/grafana.png" alt="Grafana dashboard" loading="lazy"></a>
+        </div>
+        <div class="body">
+          <h3>infra-platform — two-node cloud infrastructure project</h3>
+          <p class="meta">2026 · Ansible · Docker · GitHub Actions · ARM64 · OCI</p>
+          <ul>
+            <li>Developed an Ansible playbook to configure a bare Ubuntu server as a platform node, including firewall rules, an encrypted WireGuard tunnel, and automatic certificates.</li>
+            <li>Added monitoring with Prometheus, Grafana, and Gatus, along with backups.</li>
+            <li>This website is served by that infrastructure — its uptime is public at <a href="https://status.pavel-zin.com">status.pavel-zin.com</a>.</li>
+          </ul>
+          <p class="repo"><a href="https://github.com/pavel-zin/infra-platform" rel="me">github.com/pavel-zin/infra-platform</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <a class="thumb" href="#img-iot-master-img-architecture-png"><img src="https://raw.githubusercontent.com/pavel-zin/IoT/master/img/architecture.png" alt="Cluster architecture" loading="lazy"></a>
+        <div class="body">
+          <h3>Inception-of-Things — Kubernetes provisioning and GitOps</h3>
+          <p class="meta">2026 · Kubernetes (K3s, K3d) · Vagrant</p>
+          <p>Contributed to provisioning K3s server and agent nodes in Vagrant virtual machines, configuring hostname-based Ingress routing, and setting up a K3d cluster that synchronized deployments from a Git repository.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/IoT" rel="me">github.com/pavel-zin/IoT</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="body">
+          <h3>cloud-1 — automated multi-server deployment</h3>
+          <p class="meta">2026 · Ansible · Docker · MariaDB · Redis · Nginx</p>
+          <p>Automated the deployment of a containerized WordPress environment using Ansible, including the database, Redis caching, Nginx, Let's Encrypt certificates, and monitoring.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/cloud-1" rel="me">github.com/pavel-zin/cloud-1</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="body">
+          <h3>transcendence — real-time multiplayer web application</h3>
+          <p class="meta">2025 · TypeScript · Docker · Nginx · ELK</p>
+          <p>Contributed to a multiplayer platform with a Fastify backend managing game state through WebSockets. Deployed the application behind Nginx and integrated an ELK stack for log collection and analysis.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/transcendence" rel="me">github.com/pavel-zin/transcendence</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="body">
+          <h3>Self-hosted services</h3>
+          <p class="meta">personal server · reverse proxy · Docker</p>
+          <p>Maintain several self-hosted services, including file synchronization, a password manager, a reverse proxy, and monitoring, used by me and a number of other users.</p>
+        </div>
+      </article>
     </div>
   </section>
 
   <section>
     <h2>systems programming — c / c++</h2>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">FdF — 3D wireframe renderer</span>
-        <span class="item-meta">2024 · C · MiniLibX</span>
-      </div>
-      <p>Reads a height map, projects it isometrically and draws the mesh a
-      pixel at a time, with live rotation, zoom and translation. Written in C
-      against a minimal graphics library — no engine, no maths library.
-      — <a href="https://github.com/pavel-zin/FdF" rel="me">github.com/pavel-zin/FdF</a></p>
-      <div class="shots">
-        <a href="https://github.com/pavel-zin/FdF"><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.gif" alt="FdF rotating a wireframe mesh" loading="lazy"></a>
-        <a href="https://github.com/pavel-zin/FdF"><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.png" alt="Isometric wireframe of a height map" loading="lazy"></a>
-      </div>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">push_swap — sorting under a restricted instruction set</span>
-        <span class="item-meta">2024 · C · algorithms</span>
-      </div>
-      <p>Sorts a stack using only swap, push and rotate operations across two
-      stacks, emitting as few instructions as possible — around 620 for 100
-      values, 5600 for 500.
-      — <a href="https://github.com/pavel-zin/push_swap" rel="me">github.com/pavel-zin/push_swap</a></p>
-      <div class="shots">
-        <a href="https://github.com/pavel-zin/push_swap"><img src="https://raw.githubusercontent.com/pavel-zin/push_swap/master/img/push_swap.gif" alt="Visualizer replaying a push_swap sort" loading="lazy"></a>
-      </div>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">webserv — HTTP/1.1 server from scratch</span>
-        <span class="item-meta">2025 · C++98 · poll · CGI</span>
-      </div>
-      <p>A configurable web server in the nginx config style: virtual hosts,
-      per-location allowed methods and body-size limits, autoindex, custom
-      error pages, redirects and file uploads, all served from a single
-      <code>poll()</code> loop. CGI scripts run as external processes with a
-      timeout that kills runaways.
-      — <a href="https://github.com/pavel-zin/webserv" rel="me">github.com/pavel-zin/webserv</a></p>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">C++ module series — memory, polymorphism, templates, STL</span>
-        <span class="item-meta">2024–2025 · C++98 · ten modules</span>
-      </div>
-      <p>A progression through the language: stack versus heap and references,
-      operator overloading in canonical form, inheritance including virtual
-      resolution of a diamond, abstract classes and interfaces, exceptions,
-      the four cast operators, templates, and finally the STL containers,
-      iterators and algorithms.</p>
-      <p>The last module implements the Ford–Johnson merge-insertion sort as a
-      single class template instantiated for both <code>std::vector</code> and
-      <code>std::list</code>, choosing its code path at compile time from the
-      iterator category and inserting in Jacobsthal order to keep the
-      comparison count near the theoretical minimum. Everything builds under
-      <code>-Wall -Wextra -Werror</code>.
-      — <a href="https://github.com/pavel-zin?tab=repositories&amp;q=CPP" rel="me">CPP-00 … CPP-09</a></p>
+    <div class="grid">
+      <article class="card wide">
+        <div class="thumbs">
+          <a href="#img-minishell-master-img-minishell-demo-gif"><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell-demo.gif" alt="minishell running a piped command line" loading="lazy"></a>
+          <a href="#img-minishell-master-img-minishell-png"><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell.png" alt="minishell prompt with builtins" loading="lazy"></a>
+        </div>
+        <div class="body">
+          <h3>minishell — a POSIX-style shell</h3>
+          <p class="meta">2025 · C · processes · signals</p>
+          <p>Implemented a shell in C with parsing, pipes, redirections, environment handling, and signal management.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/minishell" rel="me">github.com/pavel-zin/minishell</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <a class="thumb" href="#img-webserv-master-img-webserv-png"><img src="https://raw.githubusercontent.com/pavel-zin/webserv/master/img/webserv.png" alt="webserv serving a page" loading="lazy"></a>
+        <div class="body">
+          <h3>webserv — HTTP server from scratch</h3>
+          <p class="meta">2025 · C++98 · poll · CGI</p>
+          <p>Built an HTTP server in C++ with non-blocking I/O, virtual hosts, and CGI support, configured in the Nginx style with per-location methods, body-size limits, autoindex and uploads.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/webserv" rel="me">github.com/pavel-zin/webserv</a></p>
+        </div>
+      </article>
+      <article class="card wide">
+        <div class="thumbs">
+          <a href="#img-fdf-master-img-fdf-gif"><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.gif" alt="Rotating a wireframe mesh" loading="lazy"></a>
+          <a href="#img-fdf-master-img-fdf-png"><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.png" alt="Isometric wireframe of a height map" loading="lazy"></a>
+        </div>
+        <div class="body">
+          <h3>FdF — 3D wireframe renderer</h3>
+          <p class="meta">2024 · C · MiniLibX</p>
+          <p>Wrote a renderer in C that reads a height map, projects it isometrically and draws the mesh pixel by pixel, with rotation, zoom and translation.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/FdF" rel="me">github.com/pavel-zin/FdF</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <a class="thumb" href="#img-minirt-master-img-minirt-navigation-gif"><img src="https://raw.githubusercontent.com/pavel-zin/miniRT/master/img/miniRT-navigation.gif" alt="Moving through a ray-traced scene" loading="lazy"></a>
+        <div class="body">
+          <h3>miniRT — ray tracer</h3>
+          <p class="meta">2025 · C · MiniLibX · group project</p>
+          <p>Contributed to a ray tracer rendering spheres, planes and cylinders with diffuse and specular lighting, shadows, and a camera that can be moved through the scene.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/miniRT" rel="me">github.com/pavel-zin/miniRT</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <a class="thumb" href="#img-push-swap-master-img-push-swap-gif"><img src="https://raw.githubusercontent.com/pavel-zin/push_swap/master/img/push_swap.gif" alt="Visualizer replaying a sort" loading="lazy"></a>
+        <div class="body">
+          <h3>push_swap — sorting under a restricted instruction set</h3>
+          <p class="meta">2024 · C · algorithms</p>
+          <p>Sorted a stack using only swap, push and rotate operations across two stacks, working to keep the instruction count low.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/push_swap" rel="me">github.com/pavel-zin/push_swap</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="body">
+          <h3>C++ module series</h3>
+          <p class="meta">2024–2025 · C++98 · ten modules</p>
+          <p>Coursework covering memory management, operator overloading, inheritance, abstract classes, exceptions, casts, templates and the STL.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin?tab=repositories&q=CPP" rel="me">github.com/pavel-zin?tab=repositories&q=CPP</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="body">
+          <h3>ft_printf — printf as a static library</h3>
+          <p class="meta">2024 · C · varargs</p>
+          <p>Reimplemented printf as a static library, supporting nine conversions with field width, precision and flags.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/ft_printf" rel="me">github.com/pavel-zin/ft_printf</a></p>
+        </div>
+      </article>
     </div>
   </section>
 
   <section>
     <h2>python</h2>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">Data handling and visualisation</span>
-        <span class="item-meta">2026 · pandas · matplotlib</span>
-      </div>
-      <p>Loading and reshaping public Gapminder datasets, then plotting them:
-      life expectancy over two centuries, country population comparisons, and
-      income against life expectancy on a log scale.
-      — <a href="https://github.com/pavel-zin/Python-2" rel="me">github.com/pavel-zin/Python-2</a></p>
-      <div class="shots">
-        <a href="https://github.com/pavel-zin/Python-2"><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex01.png" alt="Life expectancy plotted over time" loading="lazy"></a>
-        <a href="https://github.com/pavel-zin/Python-2"><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex03.png" alt="Income against life expectancy, log scale" loading="lazy"></a>
-      </div>
+    <div class="grid">
+      <article class="card wide">
+        <div class="thumbs">
+          <a href="#img-python-2-master-img-ex01-png"><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex01.png" alt="Life expectancy over time" loading="lazy"></a>
+          <a href="#img-python-2-master-img-ex03-png"><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex03.png" alt="Income against life expectancy, log scale" loading="lazy"></a>
+        </div>
+        <div class="body">
+          <h3>Data handling and visualisation</h3>
+          <p class="meta">2026 · pandas · matplotlib</p>
+          <p>Loaded and reshaped public datasets with pandas and plotted them with matplotlib.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/Python-2" rel="me">github.com/pavel-zin/Python-2</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <a class="thumb" href="#img-python-1-master-img-ex05-png"><img src="https://raw.githubusercontent.com/pavel-zin/Python-1/master/img/ex05.png" alt="Colour channel transforms" loading="lazy"></a>
+        <div class="body">
+          <h3>NumPy and image processing</h3>
+          <p class="meta">2026 · NumPy · Pillow</p>
+          <p>Worked with NumPy arrays and image transforms: slicing, crop and zoom, rotation, greyscale and per-channel colour filters.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/Python-1" rel="me">github.com/pavel-zin/Python-1</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <a class="thumb" href="#img-linear-regression-master-img-figure-1-png"><img src="https://raw.githubusercontent.com/pavel-zin/linear_regression/master/img/Figure_1.png" alt="Regression line over the dataset" loading="lazy"></a>
+        <div class="body">
+          <h3>linear_regression — gradient descent from scratch</h3>
+          <p class="meta">2026 · Python · NumPy · matplotlib</p>
+          <p>Implemented linear regression with gradient descent, storing the trained parameters for a separate predictor to read back, and scoring the fit with RMSE.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin/linear_regression" rel="me">github.com/pavel-zin/linear_regression</a></p>
+        </div>
+      </article>
+      <article class="card">
+        <div class="body">
+          <h3>Language, tooling and packaging</h3>
+          <p class="meta">2025–2026 · Python</p>
+          <p>Coursework covering abstract base classes, decorators, dataclasses, and packaging a small library as an installable distribution.</p>
+          <p class="repo"><a href="https://github.com/pavel-zin?tab=repositories&q=Python" rel="me">github.com/pavel-zin?tab=repositories&q=Python</a></p>
+        </div>
+      </article>
     </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">NumPy and image processing</span>
-        <span class="item-meta">2026 · NumPy · Pillow</span>
-      </div>
-      <p>Vectorised computation over parallel arrays, 2D slicing, and image
-      transforms written against the raw array — crop and zoom, rotation by
-      transposition, greyscale and per-channel colour filters.
-      — <a href="https://github.com/pavel-zin/Python-1" rel="me">github.com/pavel-zin/Python-1</a></p>
-      <div class="shots">
-        <a href="https://github.com/pavel-zin/Python-1"><img src="https://raw.githubusercontent.com/pavel-zin/Python-1/master/img/ex05.png" alt="Colour channel transforms of a photograph" loading="lazy"></a>
-      </div>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">Language and tooling</span>
-        <span class="item-meta">2025–2026 · stdlib</span>
-      </div>
-      <p>Abstract base classes and multiple inheritance resolved through the
-      MRO, decorators that wrap and constrain calls, dataclasses, and a small
-      library packaged as an installable distribution.
-      — <a href="https://github.com/pavel-zin?tab=repositories&amp;q=Python" rel="me">Python-0 … Python-4</a></p>
-    </div>
-  </section>
-
-  <section>
-    <h2>education</h2>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">42 Paris</span>
-        <span class="item-meta">2024-present</span>
-      </div>
-      <p>Program: RNCP 7 Expert en architecture informatique
-      (Système d'information et réseaux).</p>
-      <p>I started with the classical 42 experience in C/C++ and finished the
-      common core in 2025. Now I'm studying in the advanced part and
-      specializing.</p>
-    </div>
-
-    <div class="item">
-      <div class="item-head">
-        <span class="item-title">Russian Technological University MIREA: College of Programming and Cybersecurity (Moscow)</span>
-        <span class="item-meta">2017-2021</span>
-      </div>
-      <p>Program: Programming in Computer Systems.</p>
-      <p>During my program at RTU I studied computer science, automata theory,
-      math and statistics, operating systems, C#/C++, and the web stack.</p>
-    </div>
-  </section>
-
-  <section>
-    <h2>skills</h2>
-    <p class="skills-line">Linux · Ansible (roles, Vault, lint) · Git · Docker ·
-    K3s · firewalls (nftables) · GitHub Actions · bash · C · C++ · Python</p>
   </section>
 
   <footer>
-    <p>This page is served by the infrastructure it describes: nginx on
-    Cloud, deployed by Ansible from a Git repository.<br>
+    <p>This page is served by the infrastructure it describes: nginx on a cloud
+    VM, deployed by Ansible from a Git repository.<br>
     No JavaScript, no cookies.</p>
   </footer>
 
 </div>
+
+<!-- Full-size views. Pure CSS: each overlay shows only while it is the :target. -->
+<div class="lightbox" id="img-img-status-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="img/status.png" alt="Full size"></div>
+<div class="lightbox" id="img-img-grafana-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="img/grafana.png" alt="Full size"></div>
+<div class="lightbox" id="img-iot-master-img-architecture-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/IoT/master/img/architecture.png" alt="Full size"></div>
+<div class="lightbox" id="img-minishell-master-img-minishell-demo-gif"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell-demo.gif" alt="Full size"></div>
+<div class="lightbox" id="img-minishell-master-img-minishell-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell.png" alt="Full size"></div>
+<div class="lightbox" id="img-webserv-master-img-webserv-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/webserv/master/img/webserv.png" alt="Full size"></div>
+<div class="lightbox" id="img-fdf-master-img-fdf-gif"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.gif" alt="Full size"></div>
+<div class="lightbox" id="img-fdf-master-img-fdf-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.png" alt="Full size"></div>
+<div class="lightbox" id="img-minirt-master-img-minirt-navigation-gif"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/miniRT/master/img/miniRT-navigation.gif" alt="Full size"></div>
+<div class="lightbox" id="img-push-swap-master-img-push-swap-gif"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/push_swap/master/img/push_swap.gif" alt="Full size"></div>
+<div class="lightbox" id="img-python-2-master-img-ex01-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex01.png" alt="Full size"></div>
+<div class="lightbox" id="img-python-2-master-img-ex03-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex03.png" alt="Full size"></div>
+<div class="lightbox" id="img-python-1-master-img-ex05-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-1/master/img/ex05.png" alt="Full size"></div>
+<div class="lightbox" id="img-linear-regression-master-img-figure-1-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/linear_regression/master/img/Figure_1.png" alt="Full size"></div>
+
 </body>
 </html>
