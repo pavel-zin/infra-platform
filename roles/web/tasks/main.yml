@@ -22,6 +22,40 @@
     mode: "0644"
     directory_mode: "0755"
 
+- name: Enumerate site files in the repository
+  ansible.builtin.find:
+    paths: "{{ role_path }}/files/site"
+    recurse: true
+    hidden: true
+    file_type: file
+  delegate_to: localhost
+  become: false
+  run_once: true
+  register: web_site_source
+
+- name: Refuse to prune when the repository copy looks empty
+  ansible.builtin.assert:
+    that: web_site_source.files | length > 0
+    fail_msg: "No files under {{ role_path }}/files/site — refusing to prune /opt/web/site."
+
+- name: Find files currently deployed on the host
+  ansible.builtin.find:
+    paths: /opt/web/site
+    recurse: true
+    hidden: true
+    file_type: file
+  register: web_site_deployed
+
+- name: Remove deployed files no longer present in the repository
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ web_site_deployed.files | map(attribute='path') | difference(web_site_expected) }}"
+  vars:
+    web_site_expected: "{{ web_site_source.files | map(attribute='path')
+      | map('regex_replace', '^' ~ (role_path ~ '/files/site') | regex_escape, '/opt/web/site')
+      | list }}"
+
 - name: Deploy PHP upload limits
   ansible.builtin.copy:
     src: uploads.ini
