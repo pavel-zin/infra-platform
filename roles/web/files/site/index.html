@@ -165,14 +165,85 @@
   .card li { margin-bottom: 0.25rem; }
   .enlarge { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
 
-  /* ---- lightbox: pure CSS via :target — no JavaScript ---- */
-  .lightbox { position: fixed; inset: 0; display: none; z-index: 10;
-              background: rgba(0,0,0,.9); padding: 1.5rem; text-align: center; overflow: auto; }
-  .lightbox:target { display: block; }
-  .lightbox img { max-width: 100%; height: auto; border: 1px solid #444; background: #fff; }
-  .lightbox .backdrop { position: fixed; inset: 0; }
-  .lightbox .close { position: fixed; top: .4rem; right: 1rem; color: #fff;
-                     font-family: var(--mono); font-size: 1.7rem; text-decoration: none; }
+  /* ---- lightbox via :target, with JavaScript scroll locking ---- */
+  body.lightbox-open {
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+  }
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: rgba(0,0,0,0);
+    padding: 1.5rem;
+    text-align: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, background-color 0.22s ease, visibility 0s linear 0.22s;
+  }
+  .lightbox:target {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    background: rgba(0,0,0,.9);
+    transition: opacity 0.22s ease, background-color 0.22s ease, visibility 0s linear 0s;
+  }
+  .lightbox img {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #444;
+    background: #fff;
+    transform: scale(.97);
+    transition: transform 0.22s ease;
+  }
+  .lightbox:target img {
+    transform: scale(1);
+  }
+  .lightbox .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+  .lightbox .close {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: none;
+    border-radius: 0.45rem;
+    background: rgba(0,0,0,.58);
+    color: #fff;
+    box-shadow: 0 0.2rem 0.8rem rgba(0,0,0,.35);
+    font-family: var(--mono);
+    font-size: 1.9rem;
+    line-height: 1;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+  }
+  .lightbox .close:hover,
+  .lightbox .close:focus-visible {
+    background: rgba(0,0,0,.82);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox,
+    .lightbox img,
+    .lightbox .close {
+      transition: none;
+    }
+  }
 
   footer {
     margin-top: 3rem;
@@ -424,24 +495,49 @@
 </div>
 
 <!-- Full-size views. Pure CSS: each overlay shows only while it is the :target. -->
-<div class="lightbox" id="img-img-status-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="img/status.png" alt="Full size"></div>
-<div class="lightbox" id="img-img-grafana-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="img/grafana.png" alt="Full size"></div>
-<div class="lightbox" id="img-iot-master-img-architecture-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/IoT/master/img/architecture.png" alt="Full size"></div>
-<div class="lightbox" id="img-minishell-master-img-minishell-demo-gif"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell-demo.gif" alt="Full size"></div>
-<div class="lightbox" id="img-minishell-master-img-minishell-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell.png" alt="Full size"></div>
-<div class="lightbox" id="img-webserv-master-img-webserv-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/webserv/master/img/webserv.png" alt="Full size"></div>
-<div class="lightbox" id="img-fdf-master-img-fdf-gif"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.gif" alt="Full size"></div>
-<div class="lightbox" id="img-fdf-master-img-fdf-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.png" alt="Full size"></div>
-<div class="lightbox" id="img-minirt-master-img-minirt-navigation-gif"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/miniRT/master/img/miniRT-navigation.gif" alt="Full size"></div>
-<div class="lightbox" id="img-push-swap-master-img-push-swap-gif"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/push_swap/master/img/push_swap.gif" alt="Full size"></div>
-<div class="lightbox" id="img-python-2-master-img-ex01-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex01.png" alt="Full size"></div>
-<div class="lightbox" id="img-python-2-master-img-ex03-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex03.png" alt="Full size"></div>
-<div class="lightbox" id="img-python-1-master-img-ex05-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-1/master/img/ex05.png" alt="Full size"></div>
-<div class="lightbox" id="img-linear-regression-master-img-figure-1-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/linear_regression/master/img/Figure_1.png" alt="Full size"></div>
-<div class="lightbox" id="img-tr-pong"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/transcendence/master/img/Pong_3d.webp" alt="Full size"></div>
-<div class="lightbox" id="img-tr-elk"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/transcendence/master/img/ELK.jpg" alt="Full size"></div>
+<div class="lightbox" id="img-img-status-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="img/status.png" alt="Full size"></div>
+<div class="lightbox" id="img-img-grafana-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="img/grafana.png" alt="Full size"></div>
+<div class="lightbox" id="img-iot-master-img-architecture-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/IoT/master/img/architecture.png" alt="Full size"></div>
+<div class="lightbox" id="img-minishell-master-img-minishell-demo-gif"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell-demo.gif" alt="Full size"></div>
+<div class="lightbox" id="img-minishell-master-img-minishell-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell.png" alt="Full size"></div>
+<div class="lightbox" id="img-webserv-master-img-webserv-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/webserv/master/img/webserv.png" alt="Full size"></div>
+<div class="lightbox" id="img-fdf-master-img-fdf-gif"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.gif" alt="Full size"></div>
+<div class="lightbox" id="img-fdf-master-img-fdf-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/FdF/master/img/fdf.png" alt="Full size"></div>
+<div class="lightbox" id="img-minirt-master-img-minirt-navigation-gif"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/miniRT/master/img/miniRT-navigation.gif" alt="Full size"></div>
+<div class="lightbox" id="img-push-swap-master-img-push-swap-gif"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/push_swap/master/img/push_swap.gif" alt="Full size"></div>
+<div class="lightbox" id="img-python-2-master-img-ex01-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex01.png" alt="Full size"></div>
+<div class="lightbox" id="img-python-2-master-img-ex03-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-2/master/img/ex03.png" alt="Full size"></div>
+<div class="lightbox" id="img-python-1-master-img-ex05-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/Python-1/master/img/ex05.png" alt="Full size"></div>
+<div class="lightbox" id="img-linear-regression-master-img-figure-1-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/linear_regression/master/img/Figure_1.png" alt="Full size"></div>
+<div class="lightbox" id="img-tr-pong"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/transcendence/master/img/Pong_3d.webp" alt="Full size"></div>
+<div class="lightbox" id="img-tr-elk"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/transcendence/master/img/ELK.jpg" alt="Full size"></div>
 
 <script>
+  let pageScrollPosition = 0;
+
+  function updateLightboxState() {
+    const activeLightbox = document.querySelector('.lightbox:target');
+    const body = document.body;
+
+    if (activeLightbox && !body.classList.contains('lightbox-open')) {
+      pageScrollPosition = window.scrollY;
+      body.style.top = `-${pageScrollPosition}px`;
+      body.classList.add('lightbox-open');
+      activeLightbox.scrollTop = 0;
+    } else if (!activeLightbox && body.classList.contains('lightbox-open')) {
+      body.classList.remove('lightbox-open');
+      body.style.top = '';
+      window.scrollTo(0, pageScrollPosition);
+    }
+  }
+
+  document.querySelectorAll('a[href^="#img-"]')
+    .forEach(element => {
+      element.addEventListener('click', () => {
+        pageScrollPosition = window.scrollY;
+      });
+    });
+
   document.querySelectorAll('.lightbox .close, .lightbox .backdrop')
     .forEach(element => {
       element.addEventListener('click', event => {
@@ -449,6 +545,9 @@
         history.back();
       });
     });
+
+  window.addEventListener('hashchange', updateLightboxState);
+  updateLightboxState();
 </script>
 
 </body>
