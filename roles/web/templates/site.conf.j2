@@ -24,11 +24,21 @@ server {
         root /usr/share/nginx/html;
         index index.html;
     }
+
+    location ~* \.pdf$ {
+        root /usr/share/nginx/html;
+        add_header X-Robots-Tag "noindex, noarchive, nosnippet" always;
+    }
 }
 {% else %}
     location / {
         root /usr/share/nginx/html;
         index index.html;
+    }
+
+    location ~* \.pdf$ {
+        root /usr/share/nginx/html;
+        add_header X-Robots-Tag "noindex, noarchive, nosnippet" always;
     }
 }
 {% endif %}
