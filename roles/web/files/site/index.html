@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pavel ZINUROV - Infrastructure / DevOps - Paris</title>
+<title>Pavel Zinurov — Portfolio</title>
 <meta name="description" content="Infrastructure / DevOps student at 42 Paris. Seeking a 4-6 month internship in infrastructure, DevOps or systems administration.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='5' fill='%231a7f37'/></svg>">
 <style>
@@ -217,7 +217,7 @@
 <div class="page">
 
   <header>
-    <h1 class="name">Pavel ZINUROV</h1>
+    <h1 class="name">Pavel Zinurov</h1>
     <p class="role">Infrastructure / DevOps student at École 42</p>
   </header>
 
@@ -418,7 +418,7 @@
   <footer>
     <p>This page is served by the infrastructure it describes: nginx on a cloud
     VM, deployed by Ansible from a Git repository.<br>
-    No JavaScript, no cookies.</p>
+    </p>
   </footer>
 
 </div>
@@ -440,6 +440,16 @@
 <div class="lightbox" id="img-linear-regression-master-img-figure-1-png"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/linear_regression/master/img/Figure_1.png" alt="Full size"></div>
 <div class="lightbox" id="img-tr-pong"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/transcendence/master/img/Pong_3d.webp" alt="Full size"></div>
 <div class="lightbox" id="img-tr-elk"><a class="backdrop" href="#"></a><a class="close" href="#">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/transcendence/master/img/ELK.jpg" alt="Full size"></div>
+
+<script>
+  document.querySelectorAll('.lightbox .close, .lightbox .backdrop')
+    .forEach(element => {
+      element.addEventListener('click', event => {
+        event.preventDefault();
+        history.back();
+      });
+    });
+</script>
 
 </body>
 </html>
