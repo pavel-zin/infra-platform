@@ -155,6 +155,13 @@
   .card.wide .thumbs a + a { border-left: 1px solid var(--line); }
   .card.wide .thumbs img { width: 100%; height: 13rem; object-fit: contain;
                            background: var(--bg); display: block; }
+  /* Three thumbs need more height to stay legible, and stack rather than squeeze. */
+  .card.wide .thumbs.three img { height: 15rem; }
+  @media (max-width: 46rem) {
+    .card.wide .thumbs.three { flex-wrap: wrap; }
+    .card.wide .thumbs.three a { flex: 1 1 100%; }
+    .card.wide .thumbs.three a + a { border-left: 0; border-top: 1px solid var(--line); }
+  }
   .card .body { padding: 0.75rem 0.9rem 0.85rem; }
   .card h3 { margin: 0 0 0.15rem; font-size: 1rem; font-weight: 600; }
   .card .meta { margin: 0 0 0.45rem; font-family: var(--mono);
@@ -315,9 +322,10 @@
     <h2>infrastructure &amp; operations</h2>
     <div class="grid">
       <article class="card wide">
-        <div class="thumbs">
+        <div class="thumbs three">
           <a href="#img-img-status-png"><img src="img/status.png" alt="Public status page" loading="lazy"></a>
           <a href="#img-img-grafana-png"><img src="img/grafana.png" alt="Grafana dashboard" loading="lazy"></a>
+          <a href="#img-img-deploy-png"><img src="img/deploy.png" alt="Deploy pipeline run" loading="lazy"></a>
         </div>
         <div class="body">
           <h3>infra-platform — two-node cloud infrastructure project</h3>
@@ -497,6 +505,7 @@
 <!-- Full-size views. Pure CSS: each overlay shows only while it is the :target. -->
 <div class="lightbox" id="img-img-status-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="img/status.png" alt="Full size"></div>
 <div class="lightbox" id="img-img-grafana-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="img/grafana.png" alt="Full size"></div>
+<div class="lightbox" id="img-img-deploy-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="img/deploy.png" alt="Full size"></div>
 <div class="lightbox" id="img-iot-master-img-architecture-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/IoT/master/img/architecture.png" alt="Full size"></div>
 <div class="lightbox" id="img-minishell-master-img-minishell-demo-gif"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell-demo.gif" alt="Full size"></div>
 <div class="lightbox" id="img-minishell-master-img-minishell-png"><a class="backdrop" href="#"></a><a class="close" href="#" aria-label="Close image">&times;</a><img src="https://raw.githubusercontent.com/pavel-zin/minishell/master/img/minishell.png" alt="Full size"></div>
