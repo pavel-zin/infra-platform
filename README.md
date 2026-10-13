@@ -9,6 +9,11 @@ Ubuntu instance becomes a fully configured node — hardened SSH, default-drop
 firewall, Docker runtime, application stacks, TLS certificates, scheduled
 maintenance, encrypted offsite backups — in a single playbook run.
 
+Besides the site and the blog, the edge serves
+[whoami](roles/whoami/files/app/README.md), a browser fingerprint test that
+shows visitors the identity any website can give them without cookies,
+including the TLS and HTTP/2 fingerprints only a server can see.
+
 Everything is code: playbook runs are idempotent, and manual changes
 are treated as drift to be erased by the next run.
 
@@ -23,7 +28,9 @@ flowchart LR
 
     subgraph vcn["OCI VCN 10.0.0.0/24 · NSGs per node"]
         subgraph edge["edge1 (public: 22/80/443)"]
-            nginx[nginx 1.27]
+            sni{{"nginx stream<br/>SNI router :443"}}
+            nginx[nginx 1.27 vhosts]
+            whoami["whoami<br/>(own TLS)"]
             wp[WordPress php-fpm]
             redis[(Redis 7)]
         end
@@ -36,7 +43,10 @@ flowchart LR
 
     bucket[("OCI Object Storage<br/>encrypted restic repo")]
 
-    clients -- "80/443" --> nginx
+    clients -- "443" --> sni
+    clients -- "80" --> nginx
+    sni -- "PROXY protocol" --> nginx
+    sni -- "whoami.&lt;domain&gt;, raw TLS<br/>+ PROXY protocol" --> whoami
     le -. "ACME HTTP-01" .-> nginx
     nginx -- fastcgi --> wp
     wp --- redis
@@ -47,7 +57,8 @@ flowchart LR
     core -. "nightly restic · 443 out" .-> bucket
 ```
 
-Two firewall layers, independently default-deny:
+Two firewall layers, independently default-deny (whoami added no rules: it
+publishes no ports and is reached through nginx):
 
 | Layer | Mechanism | edge1 | core1 |
 |---|---|---|---|
@@ -61,6 +72,43 @@ push client-side-encrypted snapshots to object storage over outbound
 HTTPS only.
 
 ## Design
+
+**Some services terminate their own TLS.** whoami has to read the raw
+ClientHello and HTTP/2 frames, which a reverse proxy would consume. So
+nginx's stream module owns port 443 on the edge: it reads only the SNI, and
+either splices the encrypted stream to that service or hands it to nginx's
+own HTTPS listener on loopback, prepending a PROXY protocol header both ways
+so every backend still sees the real client address (`realip` restores it
+for the vhosts, and `port_in_redirect off` keeps the internal port out of
+generated redirects). The passthrough list is one variable,
+`web_tls_passthrough`; when it is empty the configuration is the stock one.
+Each passthrough service gets its own certificate, so its container never
+holds the main site's key, and browsers never reuse one site's connection
+for another. A misrouted request gets 421 Misdirected Request, which makes
+browsers retry on a fresh connection.
+
+**whoami keeps nothing it shows.** The page reads about forty
+script-visible signals; the server adds JA4/JA3 and HTTP/2 fingerprints, the
+network and location of the IP address (DB-IP Lite, refreshed monthly) and
+the Tor exit list (hourly), and cross-checks them the way bot-detection
+services do. Each identity is drawn as a passport (name, animal, colours,
+guilloché rosette, a machine-readable zone with real check digits) derived
+from its hash. Only a scan the visitor starts is stored, and only as
+HMAC-SHA256 values under a secret generated on the node: no IP addresses,
+raw values or User-Agent strings. Records expire 180 days after the last
+scan, "Forget this browser" deletes them immediately, and the data directory
+is deliberately left out of backups so that deletion is real. The page loads
+nothing from third parties (fonts and FingerprintJS are self-hosted, its
+telemetry off) except a STUN request when the visitor runs the WebRTC test,
+and nginx's stream proxy keeps no access log.
+
+**Images can be built on the node.** whoami's image is built on the edge
+from the source in its role and tagged with a hash of the build context:
+unchanged source means no rebuild and no restart, so steady-state runs stay
+change-free, and a source change rolls out on the next run. The Go version
+is pinned in the Dockerfile and updated by pull request. The container is
+read-only, drops every capability, and picks up renewed certificates by
+itself.
 
 **Container port bindings are always explicit.** Every published port in a
 compose file states its bind address (`127.0.0.1`, a tunnel address, or
@@ -151,7 +199,8 @@ secrets at runtime.
 ```
 .github/workflows/       # CI: lint on push/PR · CD: deploy on dispatch
 site.yml                 # base → firewall (serial) → runtime → db (core) →
-                         #   web (edge) → exporters → monitoring (core) → backups
+                         #   web (edge) → whoami (edge) → exporters →
+                         #   monitoring (core) → backups
 inventory.example.yml    # sanitized inventory shape; real inventory is gitignored
 requirements.yml         # Ansible collections
 requirements.txt         # Python toolchain (ansible, ansible-lint)
@@ -169,13 +218,17 @@ roles/
   mariadb/               # DB stack on core, tunnel-only binding
   monitoring/            # Prometheus + Grafana
   backup/                # restic → OCI object storage
-  web/                   # nginx + WordPress + Redis, declarative TLS, timers
+  web/                   # nginx + WordPress + Redis, declarative TLS, timers,
+                         #   SNI router for TLS passthrough
+  whoami/                # browser fingerprint test: Go service built on the
+                         #   node, own TLS, JA4/HTTP2 fingerprints, DB-IP
 ```
 
 ## Quickstart
 
 Requires two Ubuntu 24.04 hosts reachable over SSH, a domain with A
-records pointing at the edge node's public IP, and an OCI Object Storage
+records pointing at the edge node's public IP (the domain, `www`, `blog`,
+`status` and `whoami`), and an OCI Object Storage
 bucket with a Customer Secret Key (S3-compatible credentials) for backups.
 
 ```bash
@@ -216,6 +269,9 @@ ssh edge1 'ping -c 3 10.66.0.2'                  # tunnel path
 curl -I https://<domain>                         # HTTP/2 200, Let's Encrypt cert
 curl -I http://<domain>                          # 301 → https
 curl -I https://blog.<domain>                    # 200 (WordPress, DB over tunnel)
+curl https://whoami.<domain>                     # what the connection reveals: IP,
+                                                 #   network, JA4, HTTP/2 fingerprint
+ssh edge1 'sudo docker inspect -f "{{.State.Health.Status}}" whoami'   # healthy
 ssh edge1 'cd /opt/stacks/web && sudo docker compose run --rm -T \
   wpcli wp core is-installed && echo ok'         # checks the container→DB path
 ssh edge1 'sudo docker exec redis redis-cli info keyspace'   # object cache populated

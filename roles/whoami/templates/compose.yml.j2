@@ -1,0 +1,61 @@
+# Managed by Ansible
+services:
+  whoami:
+    image: whoami:{{ whoami_image_tag }}
+    container_name: whoami
+    restart: unless-stopped
+    pull_policy: never
+    # Root inside the container only to read its certificate key (certbot
+    # writes it 0600 root); every capability is dropped and the root
+    # filesystem is read-only.
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: {{ whoami_memory_limit }}
+    pids_limit: 256
+    environment:
+      WHOAMI_HOSTNAME: "{{ whoami_hostname }}"
+      WHOAMI_CERT_FILE: /certs/live/{{ whoami_hostname }}/fullchain.pem
+      WHOAMI_KEY_FILE: /certs/live/{{ whoami_hostname }}/privkey.pem
+      WHOAMI_RETENTION_DAYS: "{{ whoami_retention_days }}"
+      WHOAMI_GEOIP: "{{ whoami_geoip }}"
+      WHOAMI_STUN: "{{ whoami_stun }}"
+      WHOAMI_HOME_URL: "{{ whoami_home_url }}"
+      WHOAMI_SOURCE_URL: "{{ whoami_source_url }}"
+      # Keep the Go heap well inside the container limit; the rest is page
+      # cache for the memory-mapped location database.
+      GOMEMLIMIT: "{{ whoami_go_memory_limit }}"
+    volumes:
+      - type: bind
+        source: /opt/whoami/data
+        target: /data
+      # live/ holds relative symlinks into archive/; mount both at the same
+      # relative positions so renewals resolve inside the container. Never
+      # create them: an empty live/ directory would block certbot for good.
+      - type: bind
+        source: /opt/web/certbot/conf/live/{{ whoami_hostname }}
+        target: /certs/live/{{ whoami_hostname }}
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /opt/web/certbot/conf/archive/{{ whoami_hostname }}
+        target: /certs/archive/{{ whoami_hostname }}
+        read_only: true
+        bind:
+          create_host_path: false
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD", "/whoami", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  web:
+    external: true
+    name: {{ whoami_network }}

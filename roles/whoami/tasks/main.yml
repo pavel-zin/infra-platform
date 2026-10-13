@@ -1,0 +1,167 @@
+---
+- name: Require TLS (the service terminates TLS itself)
+  ansible.builtin.assert:
+    that: tls_enabled | bool
+    fail_msg: whoami reads TLS handshakes, so it needs tls_enabled and a certificate.
+
+- name: Create whoami directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  loop:
+    - path: /opt/stacks/whoami
+      mode: "0750"
+    - path: /opt/stacks/whoami/src
+      mode: "0755"
+    - path: /opt/whoami/data
+      mode: "0700"
+
+# The image is built on the node from the source in this role, so the
+# repository is the only input: no registry, no published image.
+- name: Copy the service source
+  ansible.builtin.copy:
+    src: app/
+    dest: /opt/stacks/whoami/src/
+    owner: root
+    group: root
+    mode: "0644"
+    directory_mode: "0755"
+
+- name: Enumerate source files in the repository
+  ansible.builtin.find:
+    paths: "{{ role_path }}/files/app"
+    recurse: true
+    hidden: true
+    file_type: file
+  delegate_to: localhost
+  become: false
+  run_once: true
+  register: whoami_src_repo
+
+- name: Refuse to prune when the repository copy looks empty
+  ansible.builtin.assert:
+    that: whoami_src_repo.files | length > 0
+    fail_msg: "No files under {{ role_path }}/files/app; refusing to prune the build context."
+
+- name: Find source files on the host
+  ansible.builtin.find:
+    paths: /opt/stacks/whoami/src
+    recurse: true
+    hidden: true
+    file_type: file
+  register: whoami_src_host
+
+# A file deleted from the repository must not linger in the build context,
+# where Go would still compile it.
+- name: Remove source files no longer in the repository
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ whoami_src_host.files | map(attribute='path') | difference(whoami_src_expected) }}"
+  vars:
+    whoami_src_expected: "{{ whoami_src_repo.files | map(attribute='path')
+      | map('regex_replace', '^' ~ (role_path ~ '/files/app') | regex_escape, '/opt/stacks/whoami/src')
+      | list }}"
+
+# The image tag is a hash of what goes into the image (.dockerignore leaves
+# out tests and docs): unchanged source means an unchanged tag, no rebuild
+# and no container restart.
+- name: Hash the build context
+  ansible.builtin.shell: >-
+    set -o pipefail &&
+    cd /opt/stacks/whoami/src &&
+    find . -type f ! -name '*_test.go' ! -name '*.md' ! -path '*/testdata/*' -print0
+    | LC_ALL=C sort -z | xargs -0 sha256sum | sha256sum | cut -c1-12
+  args:
+    executable: /bin/bash
+  register: whoami_src_hash
+  changed_when: false
+  check_mode: false
+
+- name: Set the image tag
+  ansible.builtin.set_fact:
+    whoami_image_tag: "{{ whoami_src_hash.stdout }}"
+
+- name: Build the image when this source version has none yet
+  community.docker.docker_image_build:
+    name: whoami
+    tag: "{{ whoami_image_tag }}"
+    path: /opt/stacks/whoami/src
+    pull: true
+    rebuild: never
+
+# The service gets a certificate of its own: its container can read only
+# this key, never the one for the rest of the site.
+- name: Read SANs of the whoami certificate
+  ansible.builtin.command: >-
+    openssl x509 -noout -ext subjectAltName
+    -in /opt/web/certbot/conf/live/{{ whoami_hostname }}/fullchain.pem
+  register: whoami_cert_sans
+  changed_when: false
+  failed_when: false
+
+- name: Decide whether a certificate must be issued
+  ansible.builtin.set_fact:
+    whoami_cert_needed: "{{ ('DNS:' ~ whoami_hostname) not in (whoami_cert_sans.stdout | default('')) }}"
+
+- name: Check that the hostname resolves
+  ansible.builtin.command: getent ahostsv4 {{ whoami_hostname }}
+  register: whoami_dns
+  changed_when: false
+  failed_when: whoami_dns.rc not in [0, 2]
+  when: whoami_cert_needed
+
+- name: Stop with instructions when the hostname has no DNS record
+  ansible.builtin.assert:
+    that: whoami_dns.rc == 0
+    fail_msg: >-
+      {{ whoami_hostname }} does not resolve. Create an A record pointing at
+      the edge node's public IP, wait for it to propagate, then run the
+      playbook again (Let's Encrypt validates the name over HTTP).
+  when: whoami_cert_needed
+
+- name: Issue the whoami certificate
+  ansible.builtin.command: >-
+    docker compose -f /opt/stacks/web/compose.yml run --rm certbot certonly
+    --webroot -w /var/www/certbot
+    --cert-name {{ whoami_hostname }} -d {{ whoami_hostname }}
+    --non-interactive --agree-tos -m {{ certbot_email }}
+  when: whoami_cert_needed
+  changed_when: true
+
+- name: Deploy compose file
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: /opt/stacks/whoami/compose.yml
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Start whoami stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/stacks/whoami
+    state: present
+    pull: never
+    remove_orphans: true
+
+- name: Wait for whoami to report healthy
+  community.docker.docker_container_info:
+    name: whoami
+  register: whoami_info
+  until: whoami_info.container.State.Health.Status == 'healthy'
+  retries: 24
+  delay: 5
+
+- name: Remove superseded whoami images
+  ansible.builtin.shell: >-
+    set -o pipefail &&
+    docker image ls -q --filter label=io.pavel-zin.service=whoami
+    --filter before=whoami:{{ whoami_image_tag }}
+    | sort -u | xargs -r docker image rm
+  args:
+    executable: /bin/bash
+  register: whoami_prune
+  changed_when: whoami_prune.stdout | length > 0

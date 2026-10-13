@@ -32,3 +32,35 @@ jobs:
 
       - name: Run ansible-lint
         run: ansible-lint --strict
+
+  whoami:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: roles/whoami/files/app
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # The Dockerfile pins the Go version; test with the same one.
+      - name: Read the image's Go version
+        id: go
+        run: echo "version=$(sed -n 's/^FROM golang:\([0-9.]*\)-alpine.*/\1/p' Dockerfile)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ steps.go.outputs.version }}
+          cache: false
+
+      - name: Check formatting
+        run: test -z "$(gofmt -l .)"
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -race ./...
+
+      - name: Build the image
+        run: docker build -t whoami:ci .

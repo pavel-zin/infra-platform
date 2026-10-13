@@ -32,6 +32,12 @@
   roles:
     - web
 
+- name: Browser fingerprint test (whoami)
+  hosts: edge
+  become: true
+  roles:
+    - whoami
+
 - name: Metrics exporters
   hosts: all
   become: true

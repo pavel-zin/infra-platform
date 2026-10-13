@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whoami: what websites call your browser</title>
+<meta name="description" content="See the identity any website can give your browser without cookies, and whether it survives private windows, other browsers and VPNs.">
+<meta name="color-scheme" content="light dark">
+<meta name="whoami-stun" content="{{.STUN}}">
+<meta name="whoami-retention" content="{{.RetentionDays}}">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/static/fonts/atkinson-next-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/style.css">
+<script src="/static/vendor/agent-5.3.0.min.js" defer></script>
+<script type="module" src="/static/app.js"></script>
+</head>
+<body>
+<header class="masthead">
+  <a class="wordmark" href="/" aria-label="whoami, home">whoami</a>
+  <nav aria-label="Elsewhere">
+    {{- if .HomeURL}}<a href="{{.HomeURL}}">{{.HomeLabel}}</a>{{end}}
+    {{- if .SourceURL}}<a href="{{.SourceURL}}">Source code</a>{{end}}
+  </nav>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="headline">
+    <div class="hero-text">
+      <h1 id="headline">Websites can name you without asking.</h1>
+      <p class="lede" id="lede">In about a second, any site can turn the quirks of your browser into a name that survives cleared cookies and private windows. Scan to see yours, then try to change it.</p>
+    </div>
+    <div class="hero-actions">
+      <div class="actions">
+        <button type="button" class="button primary" id="scan" disabled>Scan this browser</button>
+        <button type="button" class="button quiet" id="forget" hidden>Forget this browser</button>
+      </div>
+      <p class="verdict" id="verdict" role="status" hidden></p>
+      <p class="consent" id="consent">Scanning keeps a keyed hash of your fingerprint for {{.RetentionDays}} days, so the next scan can tell whether you've been here before. No raw values or IP addresses are stored. <a href="#stored">What's stored</a></p>
+      <noscript><p class="consent">This test runs in JavaScript. The server-side part below works without it.</p></noscript>
+    </div>
+
+    <div class="document">
+      <article class="passport specimen" id="passport" aria-label="Your browser identity">
+        <header class="pp-band">
+          <span>Issued by any website</span>
+          <span>Browser identity</span>
+        </header>
+        <div class="pp-body">
+          <svg class="pp-watermark" id="pp-watermark" viewBox="-1 -1 2 2" aria-hidden="true"></svg>
+          <figure class="pp-photo">
+            <svg class="pp-rosette" id="pp-rosette" viewBox="-1 -1 2 2" aria-hidden="true"></svg>
+            <span class="pp-emoji" id="pp-emoji" aria-hidden="true">👤</span>
+          </figure>
+          <dl class="pp-fields">
+            <div class="pp-field pp-wide"><dt>Name <span aria-hidden="true">/ Nom</span></dt><dd id="pp-name">Not issued yet</dd></div>
+            <div class="pp-field"><dt>Identity code <span aria-hidden="true">/ Code</span></dt><dd class="mono" id="pp-code">····-····</dd></div>
+            <div class="pp-field"><dt>Browser <span aria-hidden="true">/ Navigateur</span></dt><dd id="pp-browser">Unknown</dd></div>
+            <div class="pp-field"><dt>Seen from <span aria-hidden="true">/ Vu depuis</span></dt><dd id="pp-place">{{with .Server.IP.Location}}{{if .Country}}{{if .City}}{{.City}}, {{end}}{{.Country}}{{else}}Unknown{{end}}{{end}}</dd></div>
+            <div class="pp-field"><dt>First seen <span aria-hidden="true">/ Première visite</span></dt><dd id="pp-first">Never</dd></div>
+            <div class="pp-field"><dt>Deleted on <span aria-hidden="true">/ Supprimé le</span></dt><dd id="pp-expires">{{.RetentionDays}} days after your last scan</dd></div>
+          </dl>
+          <p class="pp-specimen-mark" aria-hidden="true">Specimen</p>
+          <div class="stamp" id="stamp" aria-hidden="true" hidden>
+            <span class="stamp-word" id="stamp-word">Unique</span>
+            <span class="stamp-note" id="stamp-note"></span>
+          </div>
+        </div>
+        <div class="pp-mrz" aria-hidden="true">
+          <span id="mrz-1">P&lt;WWW&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span>
+          <span id="mrz-2">&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="names" id="names" aria-labelledby="names-title" hidden>
+    <h2 id="names-title">Your other names</h2>
+    <p class="section-lede">Every way of tracking sees a different identity. Each one below changes under different conditions, so compare them after each experiment.</p>
+    <ul class="name-list" id="name-list"></ul>
+    <div class="siblings" id="siblings" hidden>
+      <h3>Other browsers on this device and network</h3>
+      <p class="section-lede">These scans came from a different browser but share your device name and IP address. That pairing is how trackers link your browsers together.</p>
+      <ul class="sibling-list" id="sibling-list"></ul>
+    </div>
+  </section>
+
+  <section class="experiments" aria-labelledby="experiments-title">
+    <h2 id="experiments-title">Try to lose your name</h2>
+    <ul class="trials">
+      <li><h3>Open a private window</h3><p>Private windows start without cookies, so your cookie name changes. If your browser name stays the same, sites can still recognize you there.</p></li>
+      <li><h3>Switch browsers</h3><p>Your browser name changes, but your device name usually doesn't: it's built from your screen, time zone and hardware, which every browser on this computer reports alike.</p></li>
+      <li><h3>Turn on a VPN</h3><p>Your network name changes and your location moves. Your browser name stays put, and your clock may now disagree with your IP address.</p></li>
+      <li><h3>Try a privacy browser</h3><p>Tor Browser and Mullvad Browser make everyone look the same. Brave and Safari change some readings every session. Either way, a stable name is harder to pin on you.</p></li>
+    </ul>
+  </section>
+
+  <section class="signals" id="signals" aria-labelledby="signals-title" hidden>
+    <h2 id="signals-title">What gave you away</h2>
+    <p class="section-lede" id="signals-lede"></p>
+    <div id="signal-groups"></div>
+  </section>
+
+  <section class="checks" id="checks" aria-labelledby="checks-title" hidden>
+    <h2 id="checks-title">Does your story add up?</h2>
+    <p class="section-lede">Bot-detection and fraud-prevention services cross-check everything a browser reveals. A mismatch can get you blocked even when your fingerprint is common.</p>
+    <ul class="check-list" id="check-list"></ul>
+    <div class="webrtc" id="webrtc">
+      <h3>WebRTC leak test</h3>
+      <p>Video-call technology can reveal your real IP address even behind a VPN or proxy. The test asks a public STUN server (<span class="mono" id="stun-host"></span>) which address your browser comes from; nothing else is sent.</p>
+      <button type="button" class="button quiet" id="webrtc-run">Run the WebRTC test</button>
+      <p class="webrtc-result" id="webrtc-result" role="status"></p>
+    </div>
+  </section>
+
+  <section class="server" id="server" aria-labelledby="server-title">
+    <h2 id="server-title">What the server sees before any script runs</h2>
+    <p class="section-lede">This part needs no JavaScript and no cookies. Your connection carries it to every site you visit.</p>
+    <dl class="facts" id="facts">
+      {{with .Server}}
+      <div><dt>IP address</dt><dd class="mono">{{.IP.Address}}</dd></div>
+      {{if .IP.Network.ASN}}<div><dt>Network</dt><dd>{{.IP.Network.Org}} <span class="muted">AS{{.IP.Network.ASN}}</span></dd></div>{{end}}
+      {{if .IP.Location.Country}}<div><dt>Location</dt><dd>{{if .IP.Location.City}}{{.IP.Location.City}}, {{end}}{{if .IP.Location.Region}}{{.IP.Location.Region}}, {{end}}{{.IP.Location.Country}}</dd></div>{{end}}
+      {{if .IP.Tor}}<div><dt>Tor</dt><dd>This address is a Tor exit relay</dd></div>{{end}}
+      {{with .TLS}}
+      <div><dt>Connection</dt><dd>{{$.Server.Protocol}} over {{.Version}}, {{.Cipher}}</dd></div>
+      <div><dt>TLS fingerprint</dt><dd><span class="mono">{{.JA4}}</span> <span class="muted">JA4</span></dd></div>
+      <div><dt>TLS stack looks like</dt><dd>{{.FamilyName}}</dd></div>
+      {{end}}
+      {{with .HTTP2}}<div><dt>HTTP/2 fingerprint</dt><dd><span class="mono wrap">{{.Akamai}}</span></dd></div>{{end}}
+      {{end}}
+    </dl>
+    <details class="headers" id="headers">
+      <summary>Request headers</summary>
+      <dl class="header-list" id="header-list">
+        {{range .Server.Headers}}<div><dt class="mono">{{index . 0}}</dt><dd class="mono wrap">{{index . 1}}</dd></div>{{end}}
+      </dl>
+    </details>
+  </section>
+
+  <section class="about" id="about" aria-labelledby="about-title">
+    <h2 id="about-title">How this works</h2>
+    <div class="about-columns">
+      <div>
+        <h3>Fingerprinting</h3>
+        <p>The page reads about forty properties that any script can access without permission: screen, fonts, graphics card, audio stack, time zone and more. None is unique alone. Together they usually are.</p>
+        <p>The server adds what it sees in the connection itself. This service terminates TLS on its own instead of behind the usual proxy, so it can read your browser's handshake and HTTP/2 settings the way CDNs and bot-detection services do (JA4, JA3 and Akamai's HTTP/2 format).</p>
+      </div>
+      <div>
+        <h3>Names</h3>
+        <p>Each identity is a keyed hash. The name, animal, colours, rosette and code are drawn from its bits, so the same fingerprint always gets the same name and a different one almost never does. The passport's machine-readable zone encodes your code, first visit and deletion date, with real check digits.</p>
+        <p>FingerprintJS is the open-source library many sites embed; it runs here with its telemetry switched off.</p>
+      </div>
+      <div>
+        <h3 id="stored">What's stored</h3>
+        <p>For each fingerprint: keyed hashes of its attributes, the first and last scan date, a visit count, a coarse label like "Firefox on Linux", and a keyed hash of the IP address so browsers on one network can be linked. No IP addresses, User-Agent strings or raw values are stored.</p>
+        <p>Records are deleted {{.RetentionDays}} days after their last scan, are never backed up, and "Forget this browser" deletes yours immediately. No third party is contacted unless you run the WebRTC test.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p>Location and network data: <a href="https://db-ip.com">IP Geolocation by DB-IP</a> (CC BY 4.0). Tor exits: the Tor Project's bulk exit list. Browser library: <a href="https://github.com/fingerprintjs/fingerprintjs">FingerprintJS</a> (MIT). TLS fingerprints: <a href="https://github.com/FoxIO-LLC/ja4">JA4</a> (BSD) and JA3. Typeface: Atkinson Hyperlegible (OFL).</p>
+    {{- if .SourceURL}}<p>Built and deployed from <a href="{{.SourceURL}}">infra-platform</a>.</p>{{end}}
+  </div>
+</footer>
+</body>
+</html>

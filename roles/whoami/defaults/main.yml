@@ -1,0 +1,16 @@
+---
+whoami_hostname: "whoami.{{ domain }}"
+# How long a fingerprint is kept after its last scan.
+whoami_retention_days: 180
+# DB-IP Lite edition: "city" (about 130 MB, city-level) or "country"; "off"
+# disables location and network lookups.
+whoami_geoip: city
+# STUN server for the optional, visitor-started WebRTC leak test.
+whoami_stun: "stun:stun.cloudflare.com:3478"
+whoami_home_url: "https://{{ domain }}"
+whoami_source_url: "https://github.com/pavel-zin/infra-platform"
+whoami_memory_limit: 256m
+whoami_go_memory_limit: 160MiB
+# nginx's compose network. The container joins it so the TLS passthrough in
+# nginx's stream block can reach it by name; it publishes no ports itself.
+whoami_network: web_default
