@@ -1,0 +1,4 @@
+---
+# Where the HTTPS vhosts listen: directly on 443, or behind the SNI router on
+# a loopback port that receives the PROXY protocol header.
+web_https_listen: "{{ '127.0.0.1:8443 ssl proxy_protocol' if web_tls_passthrough | length > 0 else '443 ssl' }}"

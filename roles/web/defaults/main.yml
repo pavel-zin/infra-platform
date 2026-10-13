@@ -1,0 +1,9 @@
+---
+# Hostnames whose TLS is terminated by a backend instead of nginx, for
+# services that need the raw handshake. When the list is not empty, nginx's
+# stream module owns port 443: it reads only the SNI, forwards these names'
+# encrypted streams to their upstream with a PROXY protocol header carrying
+# the client address, and hands everything else to nginx's own HTTPS
+# listener on loopback. Each entry: name, server_name, upstream, and an
+# optional health_path that Gatus checks.
+web_tls_passthrough: []

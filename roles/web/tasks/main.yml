@@ -7,6 +7,7 @@
   loop:
     - /opt/stacks/web
     - /opt/web/nginx/conf.d
+    - /opt/web/nginx/main
     - /opt/web/site
     - /opt/web/certbot/www
     - /opt/web/certbot/conf
@@ -82,6 +83,16 @@
     web_cert_missing: "{{ web_cert_domains
       | difference((web_cert_sans.stdout | default(''))
       | regex_findall('DNS:([^,\\s]+)')) }}"
+
+# Mounted as a directory, not a single file: a file bind mount pins the
+# inode, and the template module replaces files by rename, so the container
+# would keep reading the old copy.
+- name: Deploy main nginx configuration
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /opt/web/nginx/main/nginx.conf
+    mode: "0644"
+  notify: Reload nginx
 
 - name: Render nginx vhosts
   ansible.builtin.include_tasks: vhosts.yml

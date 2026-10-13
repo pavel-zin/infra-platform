@@ -1,6 +1,8 @@
 ---
+# -c: the signalling process parses the same file as the master, so a broken
+# configuration fails this task instead of being reported only in the log.
 - name: Reload nginx
-  ansible.builtin.command: docker exec nginx nginx -s reload  # noqa: command-instead-of-module
+  ansible.builtin.command: docker exec nginx nginx -c /etc/nginx/main/nginx.conf -s reload  # noqa: command-instead-of-module
   changed_when: true
 
 - name: Restart certbot renewal timer

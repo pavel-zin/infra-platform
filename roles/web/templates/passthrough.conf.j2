@@ -1,0 +1,34 @@
+# Managed by Ansible
+# HTTP side of the hostnames in web_tls_passthrough. Their HTTPS never
+# reaches this file: the SNI router in nginx.conf forwards it untouched.
+{% for p in web_tls_passthrough %}
+
+server {
+    listen 80;
+    server_name {{ p.server_name }};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://{{ p.server_name }}$request_uri;
+    }
+}
+{% if web_tls_active %}
+
+# Reached only when a browser reuses a connection opened for another name on
+# this address (HTTP/2 connection coalescing). 421 makes it retry on a fresh
+# connection, which the SNI router then sends to the right backend.
+server {
+    listen {{ web_https_listen }};
+    http2 on;
+    server_name {{ p.server_name }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+
+    return 421;
+}
+{% endif %}
+{% endfor %}

@@ -8,4 +8,5 @@
     - site.conf
     - blog.conf
     - status.conf
+    - passthrough.conf
   notify: Reload nginx

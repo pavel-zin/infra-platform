@@ -23,6 +23,16 @@ endpoints:
     interval: 60s
     conditions:
       - "[STATUS] == 200"
+{% for p in web_tls_passthrough %}
+
+  - name: {{ p.name }}
+    group: public
+    url: https://{{ p.server_name }}{{ p.health_path | default('/') }}
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+      - "[CERTIFICATE_EXPIRATION] > 240h"
+{% endfor %}
 
   - name: internal network (WireGuard)
     group: internal

@@ -8,4 +8,4 @@ Requires=docker.service
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/docker compose -f /opt/stacks/web/compose.yml run --rm certbot renew
-ExecStartPost=/usr/bin/docker exec nginx nginx -s reload
+ExecStartPost=/usr/bin/docker exec nginx nginx -c /etc/nginx/main/nginx.conf -s reload

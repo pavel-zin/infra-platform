@@ -13,7 +13,7 @@ server {
 }
 
 server {
-    listen 443 ssl;
+    listen {{ web_https_listen }};
     http2 on;
     server_name {{ domain }} www.{{ domain }};
 

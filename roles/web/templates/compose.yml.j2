@@ -14,6 +14,7 @@ services:
     image: nginx:1.27
     container_name: nginx
     restart: unless-stopped
+    command: ["nginx", "-c", "/etc/nginx/main/nginx.conf", "-g", "daemon off;"]
     depends_on:
       - wordpress
       - gatus
@@ -21,6 +22,7 @@ services:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
     volumes:
+      - /opt/web/nginx/main:/etc/nginx/main:ro
       - /opt/web/nginx/conf.d:/etc/nginx/conf.d:ro
       - /opt/web/site:/usr/share/nginx/html:ro
       - /opt/web/certbot/www:/var/www/certbot:ro

@@ -14,7 +14,7 @@ server {
 
 {% if web_tls_active %}
 server {
-    listen 443 ssl;
+    listen {{ web_https_listen }};
     http2 on;
     server_name blog.{{ domain }};
 
@@ -41,9 +41,13 @@ server {
     location ~ \.php$ {
         try_files $uri =404;
         fastcgi_pass wordpress:9000;
-        include fastcgi_params;
+        include /etc/nginx/fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param HTTPS on;
+{% if web_tls_passthrough | length > 0 %}
+        # Clients reach 443; nginx itself listens on 8443 behind the router.
+        fastcgi_param SERVER_PORT 443;
+{% endif %}
     }
 }
 {% endif %}
